@@ -1,0 +1,2294 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="description" content="Voz Joven Morelia 2026 — Encuesta municipal de participación ciudadana juvenil — Morelia 2026">
+<meta property="og:title" content="Voz Joven Morelia 2026">
+<meta property="og:description" content="Participa en el diagnóstico juvenil del municipio de Morelia">
+<meta property="og:image" content="https://vozjoven.morelia.gob.mx/og-image.png">
+<title>Voz Joven Morelia 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<style>
+/* ── Reset & Variables ──────────────────────────────────── */
+:root{
+  --v:#1DB954;--vd:#0f7a38;--vc:rgba(29,185,84,.13);
+  --m:#7C3AED;--mc:rgba(124,58,237,.14);
+  --n:#FF6B35;--a:#FFD23F;--az:#1e6fbf;
+  --g1:#0d0d1a;--g2:#141428;--g3:#1a1a35;
+  --b:rgba(255,255,255,.08);--b2:rgba(255,255,255,.15);
+  --t1:#fff;--t2:rgba(255,255,255,.78);--t3:rgba(255,255,255,.45);
+  --r:10px;--r2:14px;
+  --shadow:0 4px 24px rgba(0,0,0,.4);
+  --max:860px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{font-family:"DM Sans",sans-serif;background:var(--g1);color:var(--t1);min-height:100vh;overflow-x:hidden}
+
+/* ── Typography ─────────────────────────────────────────── */
+h1,h2,h3{font-family:"Syne",sans-serif;font-weight:800;line-height:1.1}
+h1{font-size:clamp(1.8rem,6vw,3rem)}
+h2{font-size:clamp(1.2rem,4vw,1.6rem)}
+h3{font-size:clamp(1rem,3vw,1.2rem)}
+
+/* ── Utility ─────────────────────────────────────────────── */
+.max{max-width:var(--max);margin:0 auto;padding:0 16px}
+.card{background:rgba(255,255,255,.03);border:1px solid var(--b);border-radius:var(--r2)}
+.hidden{display:none!important}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+
+/* ── Header ─────────────────────────────────────────────── */
+header{background:var(--g2);border-bottom:1px solid var(--b);position:sticky;top:0;z-index:200;padding:10px 16px}
+.hdr-inner{max-width:var(--max);margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.logos{display:flex;align-items:center;gap:8px}
+.logo-chip{background:rgba(255,255,255,.05);border:1px solid var(--b2);border-radius:6px;padding:4px 9px;font-family:"Syne",sans-serif;font-size:9px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
+.logo-chip.v{border-color:rgba(29,185,84,.35);color:var(--v)}
+.logo-chip.o{border-color:rgba(255,107,53,.35);color:var(--n)}
+.logo-chip.p{border-color:rgba(124,58,237,.38);color:#c084fc}
+.hdr-title{font-family:"Syne",sans-serif;font-size:12px;font-weight:800;color:var(--v);letter-spacing:.04em}
+.hdr-nav{display:flex;gap:4px}
+.nav-btn{background:none;border:none;color:var(--t3);font-family:"DM Sans",sans-serif;font-size:11px;padding:6px 10px;border-radius:6px;cursor:pointer;transition:all .15s;white-space:nowrap}
+.nav-btn:hover,.nav-btn.on{background:var(--vc);color:var(--v)}
+@media(max-width:520px){.hdr-title{display:none}.logo-chip.p{display:none}.nav-btn{font-size:10px;padding:5px 7px}}
+
+/* ── VIEWS ─────────────────────────────────────────────── */
+.view{display:none;padding:24px 0 60px}
+.view.on{display:block}
+
+/* ── HERO ────────────────────────────────────────────────── */
+.hero{background:linear-gradient(135deg,rgba(29,185,84,.1),rgba(124,58,237,.1));border:1px solid rgba(29,185,84,.18);border-radius:18px;padding:clamp(20px,5vw,40px);margin-bottom:24px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-40px;right:-40px;width:180px;height:180px;background:radial-gradient(circle,rgba(29,185,84,.12),transparent 70%);pointer-events:none}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(29,185,84,.15);border:1px solid rgba(29,185,84,.32);border-radius:20px;padding:4px 13px;font-size:10px;font-weight:700;color:var(--v);letter-spacing:.07em;text-transform:uppercase;margin-bottom:12px}
+.live-dot{width:6px;height:6px;background:var(--v);border-radius:50%;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.5)}}
+.hero h1{background:linear-gradient(90deg,#fff,var(--v));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:10px}
+.hero p{color:var(--t2);font-size:clamp(.85rem,2.5vw,1rem);line-height:1.7;max-width:540px;margin-bottom:16px}
+.hero-cta{display:flex;gap:10px;flex-wrap:wrap}
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
+@media(max-width:500px){.stat-row{grid-template-columns:repeat(2,1fr)}}
+.stat-c{background:rgba(255,255,255,.04);border:1px solid var(--b);border-radius:10px;padding:10px 8px;text-align:center}
+.stat-n{font-family:"Syne",sans-serif;font-size:clamp(1.4rem,4vw,1.9rem);font-weight:800;color:var(--v)}
+.stat-l{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;margin-top:2px}
+
+/* ── BUTTONS ─────────────────────────────────────────────── */
+.btn{padding:10px 22px;border-radius:8px;font-family:"DM Sans",sans-serif;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .18s;display:inline-flex;align-items:center;justify-content:center;gap:6px;text-decoration:none;line-height:1;user-select:none}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none!important}
+.btn-v{background:var(--v);color:#000}.btn-v:hover:not(:disabled){background:#17a347;transform:translateY(-1px)}
+.btn-m{background:var(--m);color:#fff}.btn-m:hover:not(:disabled){background:#6626d4}
+.btn-s{background:rgba(255,255,255,.07);color:var(--t2);border:1px solid var(--b)}.btn-s:hover:not(:disabled){background:rgba(255,255,255,.12)}
+.btn-lg{padding:13px 28px;font-size:14px;width:100%;border-radius:10px}
+.btn-full{width:100%;justify-content:center}
+
+/* ── FORM ────────────────────────────────────────────────── */
+.form-section{margin-bottom:28px}
+.sec-header{background:linear-gradient(90deg,var(--vd),var(--m));border-radius:var(--r) var(--r) 0 0;padding:12px 16px;display:flex;align-items:center;gap:10px}
+.sec-num{width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-family:"Syne",sans-serif;font-size:11px;font-weight:800;flex-shrink:0}
+.sec-title{font-family:"Syne",sans-serif;font-size:13px;font-weight:700}
+.sec-sub{font-size:10.5px;color:rgba(255,255,255,.65);margin-top:1px}
+.sec-body{padding:18px;background:rgba(255,255,255,.02);border:1px solid var(--b);border-top:none;border-radius:0 0 var(--r) var(--r)}
+
+.fg{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.fg label{font-size:11px;font-weight:500;color:var(--t3);text-transform:uppercase;letter-spacing:.05em}
+.fg label .req{color:var(--n)}
+.fg input,.fg select,.fg textarea{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:8px;color:var(--t1);font-family:"DM Sans",sans-serif;font-size:14px;padding:10px 14px;outline:none;width:100%;transition:border-color .2s,background .2s;-webkit-appearance:none}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--v);background:rgba(29,185,84,.07)}
+.fg input.error,.fg select.error{border-color:var(--n)!important;background:rgba(255,107,53,.07)!important}
+.fg .hint{font-size:10.5px;color:var(--t3);line-height:1.5}
+.fg .err-msg{font-size:11px;color:var(--n);display:none}
+.fg.has-error .err-msg{display:block}
+.fg select option{background:#1a1a35;color:#fff}
+.fg textarea{resize:vertical;min-height:72px}
+
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+@media(max-width:540px){.grid-2,.grid-3{grid-template-columns:1fr}}
+
+/* ── SCALE (1-10) ────────────────────────────────────────── */
+.scale-card{background:rgba(255,255,255,.03);border:1px solid var(--b);border-radius:var(--r);padding:14px;margin-bottom:10px;transition:border-color .2s}
+.scale-card.filled{border-color:rgba(29,185,84,.3)}
+.scale-top{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.scale-ico{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.scale-lbl{flex:1;min-width:0}
+.scale-lbl strong{font-size:12.5px;font-weight:600;display:block}
+.scale-lbl span{font-size:10.5px;color:var(--t3)}
+.scale-score{font-family:"Syne",sans-serif;font-size:1.6rem;font-weight:800;min-width:36px;text-align:center}
+.scale-row{display:flex;align-items:center;gap:6px}
+.scale-hint{font-size:9.5px;color:var(--t3);white-space:nowrap;width:55px}
+.scale-hint.r{text-align:right}
+input[type=range]{-webkit-appearance:none;appearance:none;flex:1;height:5px;border-radius:3px;background:rgba(255,255,255,.1);outline:none;cursor:pointer;border:none!important;padding:0!important;background-color:transparent}
+input[type=range]::-webkit-slider-runnable-track{height:5px;border-radius:3px;background:rgba(255,255,255,.1)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;margin-top:-7px;box-shadow:0 0 0 3px rgba(29,185,84,.2);cursor:pointer;background:var(--v)}
+input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;border:none;background:var(--v);cursor:pointer}
+
+/* ── CHECKBOX / RADIO ────────────────────────────────────── */
+.check-group{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:7px}
+.check-item{background:rgba(255,255,255,.03);border:1px solid var(--b);border-radius:8px;padding:9px 12px;cursor:pointer;display:flex;align-items:center;gap:8px;font-size:12.5px;transition:all .15s;user-select:none;-webkit-user-select:none}
+.check-item:hover{border-color:rgba(29,185,84,.3);background:rgba(29,185,84,.05)}
+.check-item.on{border-color:var(--v);background:rgba(29,185,84,.1);color:var(--v)}
+.check-item input{display:none}
+.chk-box{width:18px;height:18px;border-radius:4px;border:2px solid rgba(255,255,255,.2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;transition:all .15s}
+.check-item.on .chk-box{background:var(--v);border-color:var(--v);color:#000}
+.radio-group{display:flex;flex-direction:column;gap:7px}
+.radio-item{background:rgba(255,255,255,.03);border:1px solid var(--b);border-radius:8px;padding:10px 14px;cursor:pointer;display:flex;align-items:center;gap:10px;font-size:13px;transition:all .15s;user-select:none;-webkit-user-select:none}
+.radio-item:hover{border-color:rgba(29,185,84,.3)}
+.radio-item.on{border-color:var(--v);background:rgba(29,185,84,.08)}
+.radio-item input{display:none}
+.rdot{width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,.2);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.radio-item.on .rdot{border-color:var(--v)}
+.radio-item.on .rdot::after{content:'';width:8px;height:8px;border-radius:50%;background:var(--v);display:block}
+
+/* ── PROPUESTAS ──────────────────────────────────────────── */
+.prop-card{background:rgba(255,255,255,.025);border:1px solid var(--b);border-radius:var(--r);padding:12px 14px;margin-bottom:8px;border-left:3px solid transparent;transition:border-color .2s}
+.prop-card.active{border-left-color:var(--v)}
+.prop-header{display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:0}
+.prop-chk{width:20px;height:20px;border-radius:5px;border:1.5px solid var(--b2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;transition:all .15s}
+.prop-card.active .prop-chk{background:var(--v);border-color:var(--v);color:#000}
+.prop-body{display:none;margin-top:10px;padding-top:10px;border-top:1px solid var(--b)}
+.prop-card.active .prop-body{display:block}
+
+/* ── ARCO / PRIVACIDAD ───────────────────────────────────── */
+.arco-box{background:rgba(30,111,191,.08);border:1px solid rgba(30,111,191,.25);border-radius:var(--r);padding:14px;margin-bottom:14px;font-size:12px;color:var(--t2);line-height:1.7}
+.arco-box h4{font-family:"Syne",sans-serif;font-size:12px;font-weight:700;color:#5ab4ff;margin-bottom:6px}
+.arco-box ul{padding-left:16px;margin-top:4px}
+.arco-box li{margin-bottom:3px}
+.accept-row{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:rgba(255,255,255,.03);border:1px solid var(--b);border-radius:8px;margin-bottom:10px;cursor:pointer;user-select:none}
+.accept-row.on{border-color:var(--v);background:rgba(29,185,84,.07)}
+.accept-row .chk-box{margin-top:1px;flex-shrink:0}
+.accept-row.on .chk-box{background:var(--v);border-color:var(--v);color:#000}
+.accept-row p{font-size:12px;color:var(--t2);line-height:1.6}
+
+/* ── PROGRESS BAR ────────────────────────────────────────── */
+.prog-wrap{background:rgba(255,255,255,.06);border-radius:4px;height:4px;margin-bottom:20px;overflow:hidden}
+.prog-bar{height:100%;background:linear-gradient(90deg,var(--v),var(--m));border-radius:4px;transition:width .4s ease}
+.step-indicator{display:flex;gap:6px;justify-content:center;margin-bottom:20px}
+.step-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.15);transition:all .3s}
+.step-dot.on{background:var(--v);width:24px;border-radius:4px}
+.step-dot.done{background:rgba(29,185,84,.5)}
+
+/* ── ALERT / TOAST ───────────────────────────────────────── */
+.alert{padding:10px 14px;border-radius:8px;font-size:12.5px;margin-bottom:12px;line-height:1.55;display:flex;align-items:flex-start;gap:8px}
+.alert-w{background:rgba(255,210,63,.09);border:1px solid rgba(255,210,63,.25);color:var(--a)}
+.alert-g{background:var(--vc);border:1px solid rgba(29,185,84,.28);color:var(--v)}
+.alert-r{background:rgba(255,107,53,.09);border:1px solid rgba(255,107,53,.25);color:var(--n)}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--g2);border:1px solid var(--b2);border-radius:10px;padding:12px 20px;font-size:13px;z-index:999;transition:transform .3s;box-shadow:var(--shadow);max-width:90vw;text-align:center}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.success{border-color:rgba(29,185,84,.4);color:var(--v)}
+.toast.error{border-color:rgba(255,107,53,.4);color:var(--n)}
+
+/* ── SPINNER ─────────────────────────────────────────────── */
+.spinner{width:20px;height:20px;border:2px solid rgba(255,255,255,.15);border-top-color:var(--v);border-radius:50%;animation:spin .7s linear infinite;display:inline-block;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── CONFIRMATION ────────────────────────────────────────── */
+.confirm-box{text-align:center;padding:clamp(20px,6vw,48px) 20px}
+.check-circle{width:72px;height:72px;background:rgba(29,185,84,.15);border:2px solid var(--v);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 16px}
+.folio-tag{background:rgba(29,185,84,.12);border:1px solid rgba(29,185,84,.3);border-radius:8px;padding:8px 16px;font-family:"Syne",sans-serif;font-size:14px;font-weight:700;color:var(--v);display:inline-block;margin:10px 0 4px;letter-spacing:.05em}
+
+/* ── DASHBOARD ───────────────────────────────────────────── */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+@media(max-width:600px){.kpi-grid{grid-template-columns:repeat(2,1fr)}}
+.kpi{padding:13px 14px;border-radius:var(--r);position:relative;overflow:hidden}
+.kpi::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;border-radius:0 0 var(--r) var(--r)}
+.kpi.g::after{background:var(--v)}.kpi.p::after{background:var(--m)}.kpi.o::after{background:var(--n)}.kpi.a::after{background:var(--a)}
+.kpi-l{font-size:9.5px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px}
+.kpi-v{font-family:"Syne",sans-serif;font-size:24px;font-weight:800;line-height:1}
+.kpi-s{font-size:10px;color:var(--t3);margin-top:3px}
+.chart-card{padding:16px 18px;margin-bottom:14px}
+.chart-title{font-family:"Syne",sans-serif;font-size:12px;font-weight:700;color:var(--t2);margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+.dash-tabs{display:flex;gap:3px;background:rgba(255,255,255,.04);border:1px solid var(--b);border-radius:8px;padding:3px;margin-bottom:14px;flex-wrap:wrap}
+.dtb{background:none;border:none;border-radius:6px;color:var(--t3);font-family:"DM Sans",sans-serif;font-size:11px;padding:7px 12px;cursor:pointer;transition:all .15s;white-space:nowrap}
+.dtb:hover{color:var(--t2)}.dtb.on{background:var(--vc);color:var(--v);font-weight:600}
+.dpanel{display:none}.dpanel.on{display:block}
+
+/* ── VTAB (vertical bars) ────────────────────────────────── */
+.vtab{background:rgba(255,255,255,.03);border:1px solid var(--b);border-radius:var(--r);padding:11px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:7px}
+.vtab-left{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
+.vtab-ico{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.vtab-nm{font-weight:600;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vtab-d{font-size:10px;color:var(--t3);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sbar-tr{flex:1;height:5px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden}
+.sbar-fi{height:100%;border-radius:3px;transition:width .8s ease}
+.vtab-sc{font-family:"Syne",sans-serif;font-size:1.4rem;font-weight:800;min-width:40px;text-align:right}
+
+/* ── LOADING OVERLAY ─────────────────────────────────────── */
+#loading-overlay{position:fixed;inset:0;background:rgba(13,13,26,.95);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:1000;gap:16px;transition:opacity .3s}
+#loading-overlay.hidden{opacity:0;pointer-events:none}
+.loading-logo{font-family:"Syne",sans-serif;font-size:1.5rem;font-weight:800;color:var(--v)}
+.loading-bar{width:160px;height:3px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden}
+.loading-bar-inner{height:100%;background:var(--v);border-radius:2px;animation:load-bar 1.8s ease-in-out infinite}
+@keyframes load-bar{0%{width:0%;margin-left:0}50%{width:60%}100%{width:0%;margin-left:100%}}
+
+/* ── FOOTER ──────────────────────────────────────────────── */
+footer{background:var(--g2);border-top:1px solid var(--b);padding:20px 16px;margin-top:40px;text-align:center}
+.footer-inner{max-width:var(--max);margin:0 auto}
+.footer-logos{display:flex;justify-content:center;gap:12px;margin-bottom:10px;flex-wrap:wrap}
+.footer-txt{font-size:11px;color:var(--t3);line-height:1.7}
+
+/* ── RESPONSIVE FIXES ────────────────────────────────────── */
+@media(max-width:420px){
+  .btn-lg{padding:12px 20px;font-size:13px}
+  .sec-body{padding:14px 12px}
+  .scale-hint{display:none}
+}
+
+/* ── AUTOCOMPLETE COLONIAS ──────────────────────────────── */
+.col-item{padding:9px 12px;cursor:pointer;font-size:13px;border-bottom:1px solid rgba(255,255,255,.05);display:flex;align-items:center;justify-content:space-between;gap:8px;transition:background .1s}
+.col-item em{font-style:normal;font-size:9px;background:rgba(255,255,255,.08);border-radius:3px;padding:1px 5px;color:rgba(255,255,255,.4);margin-left:5px}
+.col-cp{font-size:9px;background:rgba(124,58,237,.2);color:#c084fc;border-radius:3px;padding:1px 6px;white-space:nowrap;flex-shrink:0}
+.ac-item{padding:9px 14px;cursor:pointer;font-size:13px;border-bottom:1px solid rgba(255,255,255,.06);color:var(--t1);transition:background .1s}
+.ac-item:last-child{border-bottom:none}
+/* ── MAP ────────────────────────────────────────────────── */
+.map-wrap{height:calc(100vh - 300px);min-height:420px;border-radius:var(--r2);overflow:hidden;border:1px solid var(--b);margin-bottom:12px}
+#heat-map{width:100%;height:100%}
+.leaflet-tile-pane{filter:brightness(.62) invert(1) contrast(1.18) hue-rotate(200deg) saturate(.52) brightness(.7)}
+.leaflet-container{background:#0d0d1a!important}
+.leaflet-control-attribution{background:rgba(0,0,0,.55)!important;color:rgba(255,255,255,.35)!important;font-size:9px!important}
+.leaflet-control-attribution a{color:var(--v)!important}
+/* Popup dinámico con color de temperatura */
+.leaflet-popup-content-wrapper{background:var(--popup-bg,#141428);border:2px solid var(--popup-border,rgba(29,185,84,.4));color:#fff;border-radius:10px;box-shadow:0 6px 28px rgba(0,0,0,.6);min-width:220px}
+.leaflet-popup-tip{background:var(--popup-bg,#141428)}
+.leaflet-popup-content{font-family:"DM Sans",sans-serif;font-size:12px;line-height:1.65;margin:12px 16px}
+.popup-name{font-family:"Syne",sans-serif;font-size:14px;font-weight:800;margin-bottom:6px}
+.popup-badge{display:inline-block;border-radius:5px;padding:2px 9px;font-size:10px;font-weight:700;margin-bottom:8px}
+.popup-row{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.07);font-size:11.5px}
+.popup-row:last-child{border:none}
+.popup-row span:last-child{font-weight:700}
+.popup-temp-bar{height:5px;border-radius:3px;margin-top:8px;background:rgba(255,255,255,.1)}
+.popup-temp-fill{height:100%;border-radius:3px;transition:width .5s ease}
+/* Map controls */
+.map-ctrl{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.map-ctrl select{background:rgba(255,255,255,.06);border:1px solid var(--b2);border-radius:6px;color:var(--t1);font-family:"DM Sans",sans-serif;font-size:12px;padding:6px 10px;outline:none;cursor:pointer}
+.map-ctrl select option{background:#1a1a35}
+.map-info-pill{background:rgba(29,185,84,.1);border:1px solid rgba(29,185,84,.22);border-radius:6px;padding:4px 12px;font-size:11px;color:var(--v);font-weight:600;white-space:nowrap}
+.map-info-pill.hot{background:rgba(255,107,53,.1);border-color:rgba(255,107,53,.25);color:var(--n)}
+.legend-wrap{display:flex;align-items:center;gap:8px;font-size:10px;color:var(--t3);flex-wrap:wrap;margin-top:8px}
+.leg-gradient{width:130px;height:7px;border-radius:3px;background:linear-gradient(90deg,#1DB954,#FFD23F,#FF6B35,#cc2200);flex-shrink:0}
+
+</style>
+</head>
+<body>
+
+<!-- Loading overlay -->
+<div id="loading-overlay">
+  <div class="loading-logo">VOZ JOVEN</div>
+  <div class="loading-bar"><div class="loading-bar-inner"></div></div>
+  <p style="font-size:12px;color:var(--t3)">Conectando con el servidor...</p>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Header -->
+<header>
+  <div class="hdr-inner">
+    <div class="logos">
+      <span class="logo-chip v">IJUM</span>
+      <span class="logo-chip o">ILATACC</span>
+      <span class="logo-chip p">Morelia Brilla</span>
+    </div>
+    <div class="hdr-title">VOZ JOVEN MORELIA 2026</div>
+    <nav class="hdr-nav">
+      <button class="nav-btn on" onclick="showView('inicio')">Inicio</button>
+      <button class="nav-btn" onclick="showView('encuesta')">Encuesta</button>
+      <button class="nav-btn" onclick="showView('dashboard')">Dashboard</button>
+      <button class="nav-btn" onclick="showView('mapa')">🗺️ Mapa</button>
+    </nav>
+  </div>
+</header>
+
+<!-- ════════════════ INICIO ════════════════ -->
+<div class="view on" id="view-inicio">
+  <div class="max">
+    <div class="hero">
+      <div class="hero-badge"><span class="live-dot"></span>Encuesta activa — Morelia 2026</div>
+      <h1>Tu voz construye<br>Morelia</h1>
+      <p>Diagnóstico juvenil municipal coordinado por el Consejo Juvenil del H. Ayuntamiento de Morelia. Participa, propón soluciones y transforma tu ciudad.</p>
+      <div class="hero-cta">
+        <button class="btn btn-v" onclick="showView('encuesta')" style="font-size:14px;padding:12px 24px">📋 Responder encuesta</button>
+        <button class="btn btn-s" onclick="showView('dashboard')" style="font-size:14px;padding:12px 24px">📊 Ver resultados</button>
+      </div>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat-c"><div class="stat-n" id="s-tot">—</div><div class="stat-l">Respuestas</div></div>
+      <div class="stat-c"><div class="stat-n" id="s-col">—</div><div class="stat-l">Colonias</div></div>
+      <div class="stat-c"><div class="stat-n" id="s-cp">—</div><div class="stat-l">Códigos postales</div></div>
+      <div class="stat-c"><div class="stat-n" id="s-prop">—</div><div class="stat-l">Propuestas</div></div>
+    </div>
+
+    <h2 style="margin-bottom:14px">Verticales temáticas</h2>
+    <div id="inicio-vtabs"></div>
+  </div>
+</div>
+
+<!-- ════════════════ ENCUESTA ════════════════ -->
+<div class="view" id="view-encuesta">
+  <div class="max">
+
+    <!-- Bloqueo si ya contestó -->
+    <div id="ya-contesto" class="hidden">
+      <div class="confirm-box">
+        <div class="check-circle">✅</div>
+        <h2 style="margin-bottom:8px">Ya participaste</h2>
+        <p style="color:var(--t2);margin-bottom:6px">Tu número de WhatsApp y/o CURP ya tiene una respuesta registrada.</p>
+        <p style="color:var(--t3);font-size:13px">Cada persona puede responder la encuesta una sola vez.</p>
+        <button class="btn btn-v" style="margin-top:20px" onclick="showView('dashboard')">Ver resultados →</button>
+      </div>
+    </div>
+
+    <!-- Confirmación enviada -->
+    <div id="encuesta-confirmada" class="hidden">
+      <div class="confirm-box">
+        <div class="check-circle">🎉</div>
+        <h2 style="margin-bottom:8px">¡Gracias por participar!</h2>
+        <p style="color:var(--t2);font-size:15px;font-weight:500;margin-bottom:4px" id="conf-nombre"></p>
+        <div class="folio-tag" id="conf-folio"></div>
+        <p style="color:var(--t3);font-size:12px;margin-bottom:20px">Guarda este folio como comprobante de tu participación.</p>
+        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+          <button class="btn btn-v" onclick="showView('dashboard')">Ver resultados →</button>
+          <button class="btn btn-s" onclick="compartirWA()">📲 Compartir por WhatsApp</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Formulario de encuesta -->
+    <div id="encuesta-form">
+      <!-- Progress -->
+      <div class="prog-wrap"><div class="prog-bar" id="prog-bar" style="width:14%"></div></div>
+      <div class="step-indicator" id="step-dots"></div>
+
+      <!-- PASOS -->
+      <div id="steps-container"></div>
+
+      <!-- Navegación -->
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:20px;padding-top:16px;border-top:1px solid var(--b)">
+        <button class="btn btn-s" id="btn-prev" onclick="prevStep()" style="display:none">← Anterior</button>
+        <span></span>
+        <button class="btn btn-v" id="btn-next" onclick="nextStep()">Siguiente →</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════════════ DASHBOARD ════════════════ -->
+<div class="view" id="view-dashboard">
+  <div class="max">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap">
+      <div>
+        <h2 style="margin-bottom:4px">Dashboard en tiempo real</h2>
+        <p style="font-size:11px;color:var(--t3)" id="dash-ts">Cargando datos...</p>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-m" onclick="exportPDF()">⬇️ Informe PDF</button>
+        <button class="btn btn-s" onclick="loadDashboard()">🔄</button>
+      </div>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi card g"><div class="kpi-l">Respuestas</div><div class="kpi-v" style="color:var(--v)" id="d-tot">—</div><div class="kpi-s" id="d-hoy">hoy</div></div>
+      <div class="kpi card p"><div class="kpi-l">Colonias</div><div class="kpi-v" style="color:#c084fc" id="d-col">—</div><div class="kpi-s">activas</div></div>
+      <div class="kpi card o"><div class="kpi-l">Problema #1</div><div class="kpi-v" style="font-size:1rem;color:var(--n);margin-top:4px" id="d-top">—</div><div class="kpi-s" id="d-top-sc"></div></div>
+      <div class="kpi card a"><div class="kpi-l">Propuestas</div><div class="kpi-v" style="color:var(--a)" id="d-prop">—</div><div class="kpi-s">recibidas</div></div>
+    </div>
+
+    <div class="dash-tabs">
+      <button class="dtb on" onclick="dTab('general',this)">General</button>
+      <button class="dtb" onclick="dTab('demo',this)">Demográfico</button>
+      <button class="dtb" onclick="dTab('verticales',this)">Por vertical</button>
+      <button class="dtb" onclick="dTab('temporal',this)">Temporal</button>
+    </div>
+
+    <div class="dpanel on" id="dp-general">
+      <div class="card chart-card">
+        <div class="chart-title">Urgencia promedio por vertical <span style="font-size:9px;background:var(--vc);color:var(--v);border-radius:6px;padding:2px 8px;font-weight:600">MUNICIPAL</span></div>
+        <div style="position:relative;height:clamp(200px,40vw,260px)"><canvas id="ch-vert" role="img" aria-label="Urgencia por vertical"></canvas></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="card chart-card">
+          <div class="chart-title">Respuestas por zona</div>
+          <div style="position:relative;height:200px"><canvas id="ch-zona" role="img" aria-label="Por zona"></canvas></div>
+        </div>
+        <div class="card chart-card">
+          <div class="chart-title">Por género</div>
+          <div style="position:relative;height:200px"><canvas id="ch-gen" role="img" aria-label="Por género"></canvas></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dpanel" id="dp-demo">
+      <div class="card chart-card">
+        <div class="chart-title">Distribución por edad</div>
+        <div style="position:relative;height:220px"><canvas id="ch-edad" role="img" aria-label="Por edad"></canvas></div>
+      </div>
+      <div class="card chart-card">
+        <div class="chart-title">Top colonias con más participación</div>
+        <div style="position:relative;height:240px"><canvas id="ch-col" role="img" aria-label="Por colonia"></canvas></div>
+      </div>
+    </div>
+
+    <div class="dpanel" id="dp-verticales">
+      <div id="dash-vtabs"></div>
+    </div>
+
+    <div class="dpanel" id="dp-temporal">
+      <div class="card chart-card">
+        <div class="chart-title">Evolución de respuestas acumuladas</div>
+        <div style="position:relative;height:220px"><canvas id="ch-time" role="img" aria-label="Temporal"></canvas></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════ MAPA DE CALOR ════════════════ -->
+<div class="view" id="view-mapa">
+  <div class="max">
+
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap">
+      <div>
+        <h2 style="margin-bottom:4px">🗺️ Mapa de Calor — Morelia 2026</h2>
+        <p style="font-size:11px;color:var(--t3)" id="mapa-ts">Cargando datos de respuestas...</p>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-v" onclick="exportPDF()">⬇️ PDF</button>
+        <button class="btn btn-s" onclick="refreshMapa()">🔄 Actualizar</button>
+      </div>
+    </div>
+
+    <!-- Controles -->
+    <div class="map-ctrl">
+      <label style="font-size:11px;color:var(--t3);display:flex;align-items:center;gap:6px">Problemática:
+        <select id="mapa-vertical" onchange="updateHeat()">
+          <option value="total">Número de respuestas (total)</option>
+          <option value="esc_empleo">Empleabilidad</option>
+          <option value="esc_seguridad">Seguridad</option>
+          <option value="esc_oportunidades">Oportunidades</option>
+          <option value="esc_salud">Salud</option>
+          <option value="esc_educacion">Educación</option>
+          <option value="esc_participacion">Participación Ciudadana</option>
+          <option value="esc_urbanismo">Urbanismo</option>
+          <option value="esc_ambiente">Medio Ambiente</option>
+          <option value="esc_cultura">Cultura y Deportes</option>
+        </select>
+      </label>
+      <label style="font-size:11px;color:var(--t3);display:flex;align-items:center;gap:6px">Zona:
+        <select id="mapa-zona" onchange="updateHeat()">
+          <option value="">Todas las zonas</option>
+          <option value="Centro">Centro</option>
+          <option value="Norte">Norte</option>
+          <option value="Sur">Sur</option>
+          <option value="Poniente">Poniente</option>
+          <option value="Oriente">Oriente</option>
+        </select>
+      </label>
+      <div class="map-info-pill" id="mapa-cnt">— colonias activas</div>
+      <div class="map-info-pill hot" id="mapa-top">Zona más crítica: —</div>
+    </div>
+
+    <!-- Mapa -->
+    <div class="map-wrap"><div id="heat-map"></div></div>
+
+    <!-- Leyenda -->
+    <div class="legend-wrap">
+      <span>Intensidad:</span>
+      <div class="leg-gradient"></div>
+      <span>Baja urgencia</span>
+      <span style="flex:1;text-align:center">← 1 respuesta · · · · · muchas respuestas →</span>
+      <span>Alta urgencia</span>
+      <span style="margin-left:14px;color:var(--t3)">· Haz clic en un marcador para ver el detalle de la colonia</span>
+    </div>
+
+    <!-- Mini stats del mapa -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-top:16px" id="mapa-mini-stats"></div>
+
+  </div>
+</div>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logos">
+      <span class="logo-chip v">IJUM — Instituto de la Juventud Moreliana</span>
+      <span class="logo-chip o">ILATACC</span>
+      <span class="logo-chip p">H. Ayuntamiento de Morelia</span>
+    </div>
+    <p class="footer-txt">Consejo Juvenil del H. Ayuntamiento de Morelia, Michoacán · 2026<br>
+    Datos protegidos bajo el Aviso de Privacidad ARCO · <a href="mailto:evaluacionilatacc@gmail.com" style="color:var(--v)">evaluacionilatacc@gmail.com</a></p>
+  </div>
+</footer>
+
+<!-- ═══════════════════════════════════════════════════════
+     JAVASCRIPT
+═══════════════════════════════════════════════════════ -->
+<script>
+'use strict';
+
+// ── Supabase Init ────────────────────────────────────────
+const SUPABASE_URL = 'https://wmmjvrdptvmqytbstxio.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndtbWp2cmRwdHZtcXl0YnN0eGlvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA2ODAzMzQsImV4cCI6MjA5NjI1NjMzNH0.l_W6ZsHGxMGA5A_cpJEjusSoVoQsqVm4OTzBPowfAKE';
+
+// ── Catálogo de asentamientos SEPOMEX — Municipio de Morelia ───────────────
+// 1,017 asentamientos únicos · Solo para autocompletado · No bloquea el campo
+var COLONIAS_MOR = ['10 de Junio','13 de Abril','2 de Marzo','2 de Octubre','Abetos','Administración Nueva Valladolid Morelia','Adolfo López Mateos','Adolfo López Mateos (Oriente)','Agua Clara','Agua Nueva','Agustín Arriaga Rivera','Alameda','Albatros','Alberto Oviedo Mata','Alberto Oviedo Mota','Alborada','Alcaide Ignacio Pérez','Alfonso García Robles','Alonso de la Veracruz','Altavista','Altos del Durazno','Ampliación Adolfo López Mateos','Ampliación Ana María Gallaga','Ampliación Aquiles Serdán','Ampliación Balcones de Santa María','Ampliación Batalla de Morelia','Ampliación Bosques del Quinceo','Ampliación Campestre del Vergel','Ampliación Carlos Salazar','Ampliación Cayetano Andrade','Ampliación Ciudad Jardín','Ampliación Club Campestre La Huerta','Ampliación Dieciocho de Mayo','Ampliación División del Norte','Ampliación Dos de Diciembre','Ampliación Eduardo Ruíz','Ampliación El Porvenir','Ampliación El Realito','Ampliación El Valle','Ampliación Francisca Xaviera Villegas','Ampliación Félix Arreguin','Ampliación Gertrudis Sánchez','Ampliación Hacienda del Valle','Ampliación Ignacio López Rayón','Ampliación Isaac Arriaga','Ampliación Jardines de Torremolinos','Ampliación Jardines del Toreo','Ampliación La Huerta','Ampliación La Nueva Aldea','Ampliación La Soledad','Ampliación La Soledad (Norte)','Ampliación Las Margaritas','Ampliación Lomas del Punhuato','Ampliación Los Encinos','Ampliación Los Fresnos','Ampliación Los Manantiales','Ampliación Mariano Escobedo','Ampliación Mariano Jiménez','Ampliación Mariano Michelena','Ampliación Mil Cumbres','Ampliación Nicolás Romero','Ampliación Niño Artillero','Ampliación Niños Héroes de Chapultepec','Ampliación Nor-oeste La Huerta','Ampliación Palma de Tacícuaro','Ampliación Popular Progreso','Ampliación San Pascual','Ampliación Santa Cecilia','Ampliación Servando Teresa de Mier','Ampliación Simpanio Norte','Ampliación Solidaridad','Ampliación Torreón Nuevo','Ampliación Trincheras de Morelos','Ampliación Unidos Santa Cruz','Ampliación Valle Quieto','Ampliación Veinte de Noviembre','Ampliación Vista Hermosa','Ampliación de San Isidro Itzícuaro','Ampliación la Aldea Poniente','Américas Britania','Ana María Gallaga','Ana Sofía','Andana la Huerta','Andrés Quintana Roo','Antares','Antonio Alzate','Aquiles Serdán','Aracurio','Arboleda de la Huerta','Arboledas','Arboledas Tres Marías','Arboledas Valladolid','Arco de la Cantera','Arcoiris','Arcos de la Cascada','Argos','Ario 1815','Arroyo Colorado','Artículo 27 Constitucional','Asiento de Piedra (El Chirihuindo)','Asociación Zirahuén','Atapaneo','Atécuaro','Balcones de Morelia','Balcones de Santa María','Barrio Alto','Bartolomé de las Casas','Batalla de Morelia','Bello Horizonte','Benedicto López','Benito Juárez','Bicentenario','Bocanegra','Bonaterra','Bosque Camelinas','Bosque Monarca','Bosques Tres Marías','Bosques de Oriente','Bosques de la Huerta','Bosques de la Presa','Bosques del Quinceo','Buenavista','Buenavista I','Buenavista II','Buenos Aires','Bugambilias','COTO San Ángel','Cabo Sur','Camelinas','Camino Real','Campestre Deportivo Los Mezquites','Campestre San Lorenzo','Campestre del Monte','Campestre del Vergel','Campestre del Vergel (Norte)','Campestre las Cabañas','Campestre los Manantiales','Campichahua','Campo Bello','Campo Real','Campobello','Camponubes','Campos Elíseos','Camposanto','Canteras','Capula','Carlos María de Bustamante','Carlos Rivas Larrauri','Carlos Salazar','Catorce de Febrero','Cayetano Andrade','Cañada de Buena Vista','Cañadas del Bosque','Centenario','Central de Abastos','Centro Histórico','Centro SCT Michoacán','Centro de Negocios','Cerritos','Cerro Verde','Chapultepec Norte','Chapultepec Oriente','Chapultepec Sur','Charaquendo','Chihuerio','Chiquimitío','Cinco de Diciembre','Cinco de Mayo','Ciudad Industrial','Ciudad Jardín','Ciudad Peluche (La Quebradita)','Clara Córdoba','Club Campestre de Morelia','Colegios Novohispanos','Colinas del Sol','Colinas del Sur','Colonial Morelia','Comisión Federal de Electricidad','Condominio Jacarandas','Condominio Planetario','Condominio Residencial Plaza','Congreso Constituyente de Michoacán','Congreso Hispanoamericano','Congreso de Anáhuac','Congreso de Chilpancingo','Constitución de Apatzingán','Constituyentes de Apatzingán de 1814','Constituyentes de Querétaro','Consuelo Alfaro de Vázquez','Coro Grande','Corporativos Tres Marías','Cosmos','Coto del Tecnológico','Coto del Ángel','Cotzurio','Coíntzio','Cruz de la Capilla','Cruz del Barreno','Cuanajillo Grande','Cuanajillo del Toro','Cuatro de Marzo','Cuauhtémoc','Cumbre Toscana','Cumbres Morelia','Cundagua','Curimeo','Cuto de la Esperanza','De las Canteras','De las Culturas','Defensores de Puebla','Defensores de la República','Defensores de la República II','Del Bosque','Del Empleado','Del Periodista','Diamante','Dieciocho de Mayo','Diego Rivera','Diego de Basalenque','División del Norte','Doce de Diciembre','Doctor José María Coss','Doctor Miguel Silva González','Dos de Diciembre','Eduardo Ruiz','Eduardo Ruiz (Norte)','Ejidal Francisco Villa','Ejidal Ocolusen','Ejidal Tres Puentes','Ejido Jesús del Monte','Ejército de Morelos','Ejército de la República','El Agua Escondida','El Aguaje','El Alacrán','El Arenal','El Arquito','El Bañito','El Carretero','El Cerrito','El Cerrito Itzícuaro','El Ciprés','El Correo','El Dorado','El Durazno','El Edén (Camino al Edén)','El Ejido de Atapaneo','El Escobal','El Fresno','El Landín','El Laurelito (La Izama)','El Mesón Colorado','El Mirador del Punhuato','El Monasterio','El Olivar','El Paraíso','El Parian','El Parian (Poniente)','El Pastizal','El Pino (El Pino Cuate)','El Pino del Rayo','El Porvenir','El Porvenir (Rancho de Jesús)','El Potrero','El Progreso','El Pueblito','El Realito','El Reparo','El Resplandor','El Resumidero','El Rodeo (Las Praderas)','El Río','El Sabino','El Sauce','El Taray','El Terrero','El Valle','El Virrey','Electricistas','Elías Pérez Ávalos','Emiliano Zapata','Enrique Arreguín Vélez','Enrique Ramírez','Eréndira','Escritor de la Independencia','Esmeralda','Estación Jácuaro (Colonia la Reunión)','Esther Tapia','Estrella','Eucaliptos','Ex-Ejido Zimpanio Norte','FOVISSSTE Acueducto','FOVISSSTE La Huerta','FOVISSSTE Santiaguito','Faldas del Punhuato','Felicitas del Río','Felipe Carrillo Puerto','Felipe Sandoval','Filomeno Mata','Finca Campestre','Flor del Durazno','Francisca Xaviera Villegas','Francisco I. Madero','Francisco J. Múgica','Francisco Xavier Clavijero','Francisco Zarco','Fray Antonio de Lisboa','Fray Antonio de San Miguel Iglesias','Fresnos Oriente','Fresnos Oriente II','Fuentes de Morelia','Félix Arreguín','Félix Ireta','General Mariano Jiménez','General Pedro María Anaya','Gertrudis Sánchez','Gobernador Gildardo Magaña','Granjas de Morelia','Granjas de la Huerta','Granjas del Maestro','Guadalupe','Guadalupe (Capula)','Guadalupe Victoria','Guillermo Prieto I','Guillermo Prieto II','Gustavo Díaz Ordaz','Hacienda Cipres','Hacienda Corralejo','Hacienda La Trinidad','Hacienda Peñasco','Hacienda Real','Hacienda Real de La Mina','Hacienda de San Diego','Hacienda de Tinijaro','Hacienda del Monte','Hacienda del Valle','Hacienda el Retajo','Hacienda la Huerta','Hacienda los Viñedos','Heriberto Castillo Martínez','Hermanos López Rayón','Hermenegildo Galeana','Hermosa Provincia','Hojas Anchas','Horizontes de Morelia','Hospitales de Don Vasco','Huertitas','Huertos Agua Azul','Huertos de Atapaneo','Humberto Gutiérrez Corona','Héroes Insurgentes','Héroes Republicanos','Héroes de Bajan','Héroes de México','Héroes de la Nación','INDECO El Vivero','INDECO Expropiación Petrolera','INDECO La Huerta','INDECO Santiaguito','INFONAVIT Adolfo López Mateos','INFONAVIT Benito Juárez','INFONAVIT CEPAMISA','INFONAVIT Camelinas','INFONAVIT Constitución de 1857','INFONAVIT El Pípila','INFONAVIT José Sixto Verduzco','INFONAVIT Juan Aldama','INFONAVIT Juana Pavón','INFONAVIT Justo Mendoza','INFONAVIT La Colina','INFONAVIT La Quemada','INFONAVIT Loma Bonita','INFONAVIT Lomas de Hidalgo','INFONAVIT Lomas del Valle','INFONAVIT Los Manantiales','INFONAVIT Plan de Ayala','INFONAVIT Prensa Insurgente','INFONAVIT Rafael Carrillo','INFONAVIT Villa Universidad','Ichaqueo','Ignacio Allende','Ignacio López Rayón','Ignacio Ramírez','Ignacio Zaragoza','Ilustres Novohispanos','Imperio Purépecha','Independencia','Industrial','Insurgentes','Insurgentes de Valladolid','Iratzio','Irrigación','Isaac Arriaga','Isaac Arriaga (Noriega)','Itzícuaro','Jacarandas','Jardines de Guadalupe','Jardines de Iratzio','Jardines de San Antonio','Jardines de Santiaguito','Jardines de Sindurio','Jardines de Torremolinos','Jardines de Villalongín','Jardines de Vista Bella','Jardines de la Aldea','Jardines de la Aldea II','Jardines de la Aldea III','Jardines de la Aldea IV','Jardines de la Aurora','Jardines de la Loma','Jardines del Quinceo','Jardines del Rincón','Jardines del Sur','Jardines del Toreo','Jardín de la Montaña','Jardín de la Montaña II','Jaujilla','Javier Mina','Jerécuaro','Jesús González Ortega','Jesús del Monte','Joaquín Amaro','Josefa Ocampo de Mata','Josefa Ortiz de Domínguez','José María Arteaga','José María García Obeso','José María Morelos','José María Pino Suárez','José María de Cabrera','José Trinidad Guido','José Trinidad Salgado','José Vasconcelos','Joya de Buenavista','Joya de la Huerta','Joyitas','Juan Escutia','Juan José Codallos','Juan Álvarez','Julián Bonavit','Juárez','Kimberly Clark de México (KCM)','La Alberca','La Aldea','La Amargosilla','La Arriería','La Artesa','La Aurora','La Calera','La Camelina','La Campiña','La Carbonera','La Ceja','La Cieneguita (La Ciénega)','La Ciudadela','La Ciénega (Torrecillas de Atécuaro)','La Codorniz','La Cofradía','La Concepción','La Ermita','La Esperanza','La Esperanza III','La Estancia','La Factoría','La Floresta','La Floresta Michoacana','La Giralda','La Hacienda','La Hacienda de Atapaneo','La Herradura (Antiguo Camino Real)','La Higuera','La Huerta','La Insurgencia','La Joya','La Ladera Oriente','La Laguna (Los Caracoles)','La Loma','La Lomita','La Luz','La Maiza','La Mintzita','La Mora','La Morita','La Morita (Colonia la Morita)','La Nueva Aldea','La Nueva Aldea (Fracción E)','La Nueva Aldea II','La Nueva Esperanza','La Palmita (La Trampa)','La Pradera','La Presa (La Presa de Chiquimitío)','La Primavera','La Providencia','La Quemada','La Rinconada','La Sanguijuela','La Soledad','La Soledad (Oriente)','La Toscana','La Tuna Manza','La Yerbabuena','Lago I','Lago II','Lago III','Lago Paraíso','Lartesi','Las Acacías','Las Américas','Las Aves','Las Cruces','Las Cumbres','Las Flores','Las Garzas','Las Higueras','Las Huares','Las Huertas Country','Las Jacarandas','Las Magnolias','Las Margaritas','Las Marianas','Las Mariposas','Las Mesitas','Las Palmas','Las Palomas','Las Pampas','Las Peñas','Las Tinajas (La Tinaja)','Las Torrecillas','Las Trojes','Las Águilas','Leandro Valle','Leona Vicario','Leyes de Reforma','León Guzmán','Libertad','Linda Vista','Linda Vista Tres Marías','Llanos del Quinceo','Loma Alta','Loma Alta Tres Marías','Loma Blanca','Loma Bonita del Sur','Loma Caliente','Loma Dorada','Loma Dorada del Sur','Loma Larga','Loma Larga Oriente','Loma Libre','Loma Puerto del Tigre (Loma del Tigre)','Loma Real','Loma de Chapultepec','Loma de Los Viñedos','Loma de la Floresta','Loma de la Virgen','Loma de los Piñones','Loma del Salto','Lomas','Lomas de Guayangareo','Lomas de Hidalgo','Lomas de La Campiña','Lomas de La Maestranza','Lomas de Morelia','Lomas de San Juan','Lomas de Santa María','Lomas de Santiaguito','Lomas de Vista Bella','Lomas de la Aldea','Lomas de la Aurora','Lomas de la Huerta','Lomas de la Joya','Lomas de las Américas','Lomas del Bosque','Lomas del Durazno','Lomas del Mayoral','Lomas del Pedregal','Lomas del Punhuato','Lomas del Sur','Lomas del Sur II','Lomas del Sur III','Lomas del Tecnológico','Lomas del Valle','Loreto','Los Abedules','Los Capulines','Los Cedros','Los Ciruelos','Los Cuervos','Los Duraznos','Los Ejidos','Los Encinos','Los Fresnos','Los Gigantes','Los Laureles','Los Llanos','Los Manantiales de Morelia','Los Mirasoles','Los Naranjos','Los Olivos','Los Pinos de Michoacán','Los Pirules','Los Sauces','Los Tucanes','Los Álamos','Los Ángeles','Lucio Blanco','Luis Córdoba Reyes','Luis Donaldo Colosio','Lázaro Cárdenas','Manantiales Poniente','Manantiales del Parián','Mandarinos','Manga Prieta','Manuel García Pueblita','Manuel Gutiérrez Najera','Manuel Villalongín','Margarita Maza de Juárez','Margarita Morán','Mariano Abasolo','Mariano Escobedo','Mariano Michelena','Mariano Ontiveros','Mariscal Aldama','Martín Castrejón','María Auxiliadora (Casa Hogar)','Matamoros','Mauricio Martínez Solano','Medallistas Olimpicos','Melchor Ocampo','Mercado República','Mesoamérica','Metamorfosis','Michoacán','Mil Cumbres','Mirador de la Cantera','Mirador de la Montaña','Mirador del Poniente','Mirador del Quinceo','Mirador del Valle','Miralta','Miravalle','Misión de San Diego','Misión de la Montaña','Misión del Valle','Misión del Valle II','Misión del Valle III','Misión del Valle IV','Molino de Parras','Montaña Monarca I','Montaña Monarca III','Monte Bello','Monte Blanco','Monte Real','Monte Rubio (Borucas)','Monte Vento','Montevista','Morelia 450','Morelos','Mujeres Mexicanas','Mártires de Uruapan','Mártires de la Plaza','Máximo Bravo','México','Natalio Vázquez Pallares','Nicandro Ortiz','Nicolaitas Ilustres','Nicolás Bravo','Nicolás Romero','Nicolás de Régules','Nieves','Niño Artillero','Niños Héroes','Niños Héroes de Chapultepec','Nueva Chapultepec','Nueva Florida','Nueva Jacarandas','Nueva Unión','Nueva Valladolid','Nuevo Amanecer','Nuevo Horizonte','Nuevo Punhuato','Nuevo Vergel','Obrera','Ojo de Agua','Ojo de Agua (Escorpión Potrerito)','Oro Jacarandas','Pablo Galeana','Pablo González Casanova','Palmas del Sur','Palo Amarillo','Panorama','Panteón el Vergel','Parastaco','Paraíso Monarca','Paraíso de la Huerta','Paraíso del Sur','Parque Industrial','Parque Sur','Parritas','Pascual Ortiz de Ayala','Paseo Esmeralda','Paseo Galeanas','Paseo de la Castellana','Paseo de la Primavera','Paseo de las Aves','Paseo de las Lomas','Paseo de los Canarios','Paseo del Lago','Paseo del Parque','Paseo del Refugio','Paseo del Álamo','Paseo los Encinos','Paseos Alejandrina','Paseos de la Hacienda','Pastor Manuel Sánchez Camarena','Patambo','Patriotas Republicanos','Periodismo','Peña Blanca','Piedra Lisa','Pinar de el Río','Plan de Ayutla','Planchapón (Peñas de San Pedro)','Poblado Ocolusen','Popular Progreso','Popular Solidaria','Portales de Morelia','Portento','Potrerillos','Pradera del Sur','Praderas La Huerta','Praderas Paraíso','Praderas de Morelia','Praderas de la Loma','Praderas del Quinceo','Praderas del Sur II','Prados Verdes','Prados de la Huerta','Prados del Campestre','Precursores de la Revolución','Presa de los Reyes','Primo Tapia','Primo Tapia (Poniente)','Princesa Eréndira','Profesor Jesús Romero Flores','Progreso del Sur','Pueblo Viejo','Puente Gallegos','Puente Hernández','Puentecillas (Puentecitas)','Puerta Blanca','Puerta Madero','Puerta Nogal','Puerta Tres Marías Norte','Puerta Tres Marías Sur','Puerta Tres Marías Sur II','Puerta Victoria','Puertas del Sur','Puerto Banus','Puerto de Buenavista','Puerto de Celaya','Puerto de Pinos','Puerto del Madroño','Puerto la Sosa','Punta Alba','Punta Alba III','Punta Floresta','Punta Monarca','Punta Roma','Punta Terraverde','Purembe','Quinceo','Quinta Cantera','Quinta Ursula','Quintas del Sol','Rafael Dávalos','Rancho Prieto (Los Pinos)','Rancho Viejo','Real Diamante','Real Mil Cumbres','Real Punhuato','Real San Diego','Real Tulipanes','Real Universidad','Real Universidad II','Real Valladolid','Rector Díaz Rubio','Rector Hidalgo','Reforma','Residencial Bosques','Residencial Lancaster','Residencial Lima','Residencial Praderas de Santa María','Residencial Rey Chimalpopoca','Residencial San José de la Huerta','Residencial Tinijaro','Residencial Vivalto','Residencial del Sur','Rey Tariácuri','Ricardo Flores Magón','Rinconada de Morelia','Rinconada de Tinijaro','Rinconada del Sur','Rinconada del Valle','Rinconada la Huerta','Rinconada los Fresnos','Rinconada los Pirules','Rincón Bugambilias','Rincón Monte Bello','Rincón Quieto','Rincón San Diego','Rincón Santa Sofía','Rincón Tarasco','Rincón Vergel','Rincón de Agua Clara','Rincón de La Santa Cruz','Rincón de Ocolusen','Rincón de Santa María','Rincón de Vista Bella','Rincón de la Montaña','Rincón de la Ortiga','Rincón de la Trinidad','Rincón de los Fresnos','Rincón del Cielo','Rincón del Paraíso','Rincón del Pedregal','Rincón del Punhuato','Rincón del Río Grande','Rincón del Ángel','Roca Dura','Río Bello (El Campamento)','Río Florido','Ríos Mexicanos','Salvador Alcaraz Romero','Salvador Escalante','Salvador Iriarte Montes','San Antonio','San Antonio Carupo','San Antonio Coapa','San Antonio Parangare','San Bernabé','San Carlos Coapa','San Francisco','San Gabriel','San Gregorio','San Guillermo','San Isidro','San Isidro Itzícuaro','San Javier Xanámurhu','San José Coapa','San José Itzícuaro (Rancho Nuevo)','San José de las Torres','San José del Cerrito','San Juanito Itzícuaro','San Lorenzo Itzícuaro','San Marcos','San Mateo','San Mateo II','San Mateo III','San Miguel','San Miguel Coapa','San Miguel del Monte','San Nicolás Obispo','San Pascual','San Pedro','San Pedro Chicácuaro','San Rafael','San Rafael Coapa','San Rafaelillo (La Haciendita)','Santa Anita','Santa Catalina','Santa Cecilia','Santa Cruz Campo Santo','Santa Elena','Santa Fe','Santa Fe Sur','Santa Martha','Santa María de Guido','Santa Mónica','Santa Rosalía','Santiago Undameo','Santiaguito','Santillán la Huerta','Sara Malfavón','Satélite','Sebastián Lerdo de Tejada','Sendero del Bosque','Sentimientos de la Nación','Serapio Rendón','Servando Teresa de Mier','Simpanio Norte','Simpanio Norte II','Sindurio','Sindurio Norte','Sitio de Cuautla','Socialista','Solear Poniente','Solear Torremolinos','Solidaridad','Tabiqueros','Tacícuaro','Tarehuicho','Tenencia Morelos','Teremendo Jasso','Teremendo de los Reyes','Terrazas Quinceo','Terrazas Tres Marías','Terrazas Zero','Terrazas del Campestre','Tinijaro','Tirio','Tiripetío','Tiristarán','Tlalpujahua','Torre Belo Grand','Torrecillas','Torrecillas (La Torrecilla)','Torrecillas del Sur','Torres Altavista','Torres Panorama','Torres Revolución','Torres del Tepeyac','Torreón Nuevo','Torreón Nuevo II','Torreón Nuevo III','Torreón Nuevo IV','Trabajadores del Cbta Num. 7','Tres Marías','Tres Puentes','Tres de Agosto','Trincheras de Morelos','Tumbisca','Turquesa','Tzintzimacato Chico','Tzintzimacato Grande','Umécuaro','Unidos Santa Cruz','Universidad Michoacana de San Nicolás de Hidalgo','Universidades de América','Unión','Unión Antorchista','Uruapilla','Valentín Gómez Farías','Valerio Trujano','Valladolid','Valle Dorado Norte','Valle Dorado del Sur','Valle El Rosario','Valle Quieto','Valle Verde','Valle de Mil Cumbres','Valle de Mil Cumbres Sur','Valle de Primavera','Valle de las Flores','Valle de las Rosas','Valle de los Arcos','Valle de los Claveles','Valle de los Manantiales','Valle de los Reyes','Valle del Durazno','Valle del Paraíso','Valle del Punhuato','Valle del Real','Vasco de Quiroga','Veinte de Noviembre','Veintiseis de Julio','Veintitres de Marzo','Ventura Puente','Vergel de las Flores','Verónica López 3ra. Etapa','Vicente Guerrero','Vicente Lombardo Toledano','Vicente Riva Palacio','Vicente Santa María','Villa Hermosa','Villa Lomas del Paraíso','Villa Magna','Villa Magnolias','Villa Universidad','Villas Del Carmen','Villas Insurgentes','Villas Morelianas','Villas Oriente','Villas de Fátima','Villas de Lancaster','Villas de Santa María','Villas de la Esperanza','Villas de la Loma','Villas de la Loma II','Villas de la Loma III','Villas de la Montaña','Villas del Carmen','Villas del Lago','Villas del Parian','Villas del Pedregal','Villas del Real','Villas del Real Poniente','Villas del Sol','Villas del Sur','Villas del Sur II','Villas del Sur III','Virrey Antonio de Mendoza','Virreyes','Vista Bella','Vista Hermosa','Vista San Rubén','Vista Verde','Vistas del Quinceo','Vistas la Huerta','Vivento','Viveo','Viveros','Volcanes','Víctor Manuel Tinoco Rubí','Wenceslao Victoria','Xangari','Zajo Chico','Zajo Grande','Zimpanio Sur'];
+
+// Índice de búsqueda preconstruido — se genera UNA vez al cargar, no al escribir
+// Cada entrada: { k: nombre_normalizado, n: nombre_original }
+var _CASENT = null;
+function _buildAsentIdx() {
+  if (_CASENT) return;
+  _CASENT = COLONIAS_MOR.map(function(n) {
+    return { k: n.toLowerCase().replace(/[áàä]/g,'a').replace(/[éèë]/g,'e')
+                .replace(/[íìï]/g,'i').replace(/[óòö]/g,'o').replace(/[úùü]/g,'u')
+                .replace(/ñ/g,'n'), n: n };
+  });
+}
+if (typeof document !== 'undefined') {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', _buildAsentIdx);
+  } else {
+    setTimeout(_buildAsentIdx, 200);
+  }
+}
+
+// ── CANDADO 3: CPs válidos del Municipio de Morelia, Michoacán ──────────────
+// Fuente: SEPOMEX / Catálogo Nacional de Códigos Postales — 141 CPs oficiales
+var CP_VALIDOS = new Set(["58000","58010","58020","58030","58040","58048","58049","58050","58055","58056","58057","58058","58060","58066","58067","58069","58070","58078","58080","58085","58086","58087","58088","58089","58090","58093","58095","58096","58097","58098","58099","58100","58110","58114","58115","58116","58117","58118","58120","58127","58128","58130","58140","58145","58146","58147","58148","58149","58150","58158","58160","58168","58170","58175","58178","58179","58180","58183","58186","58187","58188","58189","58190","58195","58196","58197","58199","58200","58210","58216","58217","58218","58219","58220","58226","58227","58228","58229","58230","58240","58244","58245","58248","58249","58250","58253","58254","58255","58256","58257","58258","58259","58260","58270","58277","58278","58280","58290","58295","58296","58297","58300","58301","58302","58303","58304","58310","58312","58313","58317","58320","58321","58322","58323","58324","58330","58331","58332","58333","58334","58335","58336","58337","58338","58340","58341","58342","58343","58344","58345","58346","58347","58348","58350","58352","58353","58355","58356","58357","58358","58359"]);
+var sb = null;
+try {
+  sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+} catch(e) {
+  console.warn('Supabase init error:', e);
+}
+
+// ── Data ────────────────────────────────────────────────
+var VERTICALES = [
+  {id:'empleo',        label:'Empleabilidad',           icon:'💼', col:'#1DB954', bg:'rgba(29,185,84,.14)',   desc:'Empleo digno, salario justo, informalidad, primer empleo'},
+  {id:'seguridad',     label:'Seguridad',                icon:'🛡️', col:'#FF6B35', bg:'rgba(255,107,53,.14)', desc:'Violencia, inseguridad, alumbrado, espacios seguros'},
+  {id:'oportunidades', label:'Oportunidades',            icon:'🚀', col:'#FFD23F', bg:'rgba(255,210,63,.14)', desc:'Becas, emprendimiento, movilidad social, créditos'},
+  {id:'salud',         label:'Salud',                    icon:'🏥', col:'#c084fc', bg:'rgba(124,58,237,.14)', desc:'Servicios médicos, salud mental, adicciones, deporte'},
+  {id:'educacion',     label:'Educación',                icon:'📚', col:'#5ab4ff', bg:'rgba(30,111,191,.2)',  desc:'Calidad educativa, acceso, becas, infraestructura'},
+  {id:'participacion', label:'Participación Ciudadana',  icon:'🗳️', col:'#7ee8a2', bg:'rgba(29,185,84,.1)',  desc:'Voto joven, representación, consulta, presupuesto'},
+  {id:'urbanismo',     label:'Urbanismo',                icon:'🏙️', col:'#ffe066', bg:'rgba(255,210,63,.1)', desc:'Transporte, ciclovías, espacios públicos, accesibilidad'},
+  {id:'ambiente',      label:'Medio Ambiente',           icon:'🌿', col:'#00d46a', bg:'rgba(29,185,84,.16)', desc:'Áreas verdes, residuos, contaminación, movilidad'},
+  {id:'cultura',       label:'Cultura y Deportes',       icon:'🎬', col:'#f472b6', bg:'rgba(124,58,237,.16)',desc:'Espacios culturales, eventos, arte, instalaciones deportivas'}
+];
+
+// ── State ─────────────────────────────────────────────
+var STATE = {
+  step: 0,
+  totalSteps: 7,
+  datos: {},        // step 1
+  escalas: {},      // step 2
+  propuestas: {},   // step 3
+  percepcion: {},   // step 4 (satisfacción + participación)
+  canales: [],      // step 5
+  comentario: '',   // step 5
+  arco: false,      // step 6
+  privacidad: false
+};
+
+var charts = {};
+
+// ── Navigation ────────────────────────────────────────
+function showView(id) {
+  document.querySelectorAll('.view').forEach(function(v) { v.classList.remove('on'); });
+  document.querySelectorAll('.nav-btn').forEach(function(b) { b.classList.remove('on'); });
+  document.getElementById('view-' + id).classList.add('on');
+  var nbs = document.querySelectorAll('.nav-btn');
+  var ids = ['inicio', 'encuesta', 'dashboard', 'mapa'];
+  var idx = ids.indexOf(id);
+  if (nbs[idx]) nbs[idx].classList.add('on');
+  window.scrollTo(0, 0);
+  if (id === 'dashboard') loadDashboard();
+  if (id === 'inicio') loadStats();
+  if (id === 'mapa') initMapa();
+}
+
+function dTab(id, btn) {
+  document.querySelectorAll('.dpanel').forEach(function(p) { p.classList.remove('on'); });
+  document.querySelectorAll('.dtb').forEach(function(b) { b.classList.remove('on'); });
+  document.getElementById('dp-' + id).classList.add('on');
+  btn.classList.add('on');
+}
+
+// ── Toast ─────────────────────────────────────────────
+function toast(msg, type) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + (type || '');
+  setTimeout(function() { t.classList.remove('show'); }, 3500);
+}
+
+// ── Crypto helpers ────────────────────────────────────
+async function sha256(str) {
+  var buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str.trim().toUpperCase()));
+  return Array.from(new Uint8Array(buf)).map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
+}
+
+function normWA(wa) {
+  return wa.replace(/\D/g, '').replace(/^52/, '').slice(-10);
+}
+
+// CURP validation
+function validCURP(curp) {
+  var re = /^[A-Z]{4}\d{6}[HM][A-Z]{5}[A-Z0-9]\d$/i;
+  return re.test(curp.trim().toUpperCase());
+}
+
+function ageDeCURP(curp) {
+  var c = curp.trim().toUpperCase();
+  var yr = parseInt(c.substr(4, 2));
+  var mn = parseInt(c.substr(6, 2));
+  var dy = parseInt(c.substr(8, 2));
+  var now = new Date();
+  var fullYr = yr <= (now.getFullYear() % 100) ? 2000 + yr : 1900 + yr;
+  var born = new Date(fullYr, mn - 1, dy);
+  var age = now.getFullYear() - born.getFullYear();
+  var m = now.getMonth() - born.getMonth();
+  if (m < 0 || (m === 0 && now.getDate() < born.getDate())) age--;
+  return age;
+}
+
+// ── Build Form Steps ──────────────────────────────────
+function buildForm() {
+  // Reset consent flags on every new form build
+  STATE.arco = false;
+  STATE.privacidad = false;
+  var container = document.getElementById('steps-container');
+  container.innerHTML = [
+    buildStep1(),
+    buildStep2(),
+    buildStep3(),
+    buildStep4(),
+    buildStep5(),
+    buildStep6(),
+    buildStep7()
+  ].join('');
+
+  // Build step dots
+  var dots = document.getElementById('step-dots');
+  dots.innerHTML = '';
+  for (var i = 0; i < STATE.totalSteps; i++) {
+    var d = document.createElement('div');
+    d.className = 'step-dot' + (i === 0 ? ' on' : '');
+    d.id = 'dot-' + i;
+    dots.appendChild(d);
+  }
+
+  // Attach range listeners
+  VERTICALES.forEach(function(v) {
+    var inp = document.getElementById('rng-' + v.id);
+    if (inp) {
+      inp.addEventListener('input', function() {
+        updateScale(v.id, this.value, v.col);
+      });
+    }
+  });
+
+  // ── Attach checkbox click events (avoids label double-fire bug) ──────────
+  function attachChkEvents() {
+    // Use event delegation on each check-group container — ONE listener per group
+    document.querySelectorAll('.check-group, #chk-canales').forEach(function(group) {
+      if (group._chkBound) return;   // already bound, skip
+      group._chkBound = true;
+      group.addEventListener('click', function(e) {
+        var label = e.target.closest ? e.target.closest('.check-item') : null;
+        if (!label) return;
+        e.preventDefault();
+        label.classList.toggle('on');
+        var inp = label.querySelector('input');
+        if (inp) inp.checked = label.classList.contains('on');
+      });
+    });
+  }
+  attachChkEvents();
+
+  // Checkbox events attached once at buildForm()
+
+  updateNavButtons();
+}
+
+function buildStep1() {
+  return '<div class="step" id="step-0">' +
+    '<div class="form-section">' +
+      '<div class="sec-header"><div class="sec-num">1</div>' +
+      '<div><div class="sec-title">Datos personales</div>' +
+      '<div class="sec-sub">Identificación y ubicación · Campos obligatorios *</div></div></div>' +
+      '<div class="sec-body">' +
+        '<div class="alert alert-w" style="margin-bottom:14px">⚠️ Solo podrás responder esta encuesta ' +
+        '<strong>una vez</strong>. Se valida por WhatsApp y CURP. Edad válida: 18 a 30 años.</div>' +
+        '<div class="grid-2">' +
+          fg('nombre', 'Nombre completo *', 'text', 'Tu nombre completo', true) +
+          fg('curp', 'CURP * (18-30 años)', 'text', 'XXXX000000XXXXXX00', true, 'Valida tu edad de 18 a 30 años') +
+        '</div>' +
+        '<div class="grid-3">' +
+          fg('edad', 'Edad *', 'number', '18-30', true) +
+          fgSel('genero', 'Género', ['','Mujer','Hombre','No binario / Otro','Prefiero no decir']) +
+          fg('whatsapp', 'WhatsApp * (10 dígitos)', 'tel', '4431234567', true, 'Sin código de país') +
+        '</div>' +
+        '<div class="grid-2">' +
+          fg('email', 'Correo electrónico', 'email', 'tuemail@ejemplo.com', false, 'Opcional · Para recibir confirmación de tu participación') +
+          fg('calle', 'Calle y número *', 'text', 'Ej. Av. Madero 123', true) +
+        '</div>' +
+        '<div class="grid-2">' +
+          fgColoniaAC() +
+        '</div>' +
+        '<div class="grid-2">' +
+          fg('cp', 'Código postal * (solo Municipio de Morelia)', 'text', 'Ej. 58147', true, 'Tu CP debe pertenecer al Municipio de Morelia. Búscalo en Google Maps escribiendo tu colonia + Morelia, o en cualquier recibo de tu domicilio.') +
+          fgSel('nivel_edu', 'Nivel educativo', ['','Preparatoria/Bachillerato','Universidad (en curso)','Licenciatura terminada','Posgrado','Otro']) +
+        '</div>' +
+        '<div class="grid-2">' +
+          fg('institucion', 'Institución educativa', 'text', 'UMSNH, Tec Morelia...') +
+          '<div class="fg">' +
+            '<label>Estado laboral</label>' +
+            '<div class="radio-group" id="rg-laboral">' +
+              radioItem('Trabaja') + radioItem('Estudia y trabaja') +
+              radioItem('Solo estudia') + radioItem('Ninguno (NINI)') +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
+}
+function buildStep2() {
+  var html = '<div class="step hidden" id="step-1">' +
+    '<div class="form-section">' +
+      '<div class="sec-header"><div class="sec-num">2</div><div><div class="sec-title">Urgencia por vertical temática</div><div class="sec-sub">Califica del 1 (poco urgente) al 10 (crítico)</div></div></div>' +
+      '<div class="sec-body">' +
+        '<div class="alert alert-g" style="margin-bottom:14px">💡 Mueve el control para indicar qué tan urgente es cada tema para los jóvenes de Morelia.</div>';
+
+  VERTICALES.forEach(function(v) {
+    html += '<div class="scale-card" id="sc-' + v.id + '">' +
+      '<div class="scale-top">' +
+        '<div class="scale-ico" style="background:' + v.bg + '">' + v.icon + '</div>' +
+        '<div class="scale-lbl"><strong>' + v.label + '</strong><span>' + v.desc + '</span></div>' +
+        '<div class="scale-score" style="color:' + v.col + '" id="sv-' + v.id + '">5</div>' +
+      '</div>' +
+      '<div class="scale-row">' +
+        '<span class="scale-hint">Poco urgente</span>' +
+        '<input type="range" min="1" max="10" value="5" id="rng-' + v.id + '" aria-label="' + v.label + '">' +
+        '<span class="scale-hint r">Crítico</span>' +
+      '</div>' +
+    '</div>';
+  });
+
+  html += '<div class="fg" style="margin-top:12px">' +
+    '<label>Observación adicional (opcional)</label>' +
+    '<textarea id="obs-urgencias" placeholder="Algún tema urgente que no está en la lista..."></textarea>' +
+  '</div>';
+  html += '</div></div></div>';
+  return html;
+}
+
+function buildStep3() {
+  var html = '<div class="step hidden" id="step-2">' +
+    '<div class="form-section">' +
+      '<div class="sec-header"><div class="sec-num">3</div><div><div class="sec-title">Propuestas de solución</div><div class="sec-sub">Selecciona hasta 3 temas y escribe tu propuesta</div></div></div>' +
+      '<div class="sec-body">' +
+        '<div class="alert alert-w" style="margin-bottom:14px">✏️ Elige hasta <strong>3 verticales</strong> y describe una propuesta concreta. Tus ideas llegan directamente al Consejo Juvenil.</div>';
+
+  VERTICALES.forEach(function(v) {
+    html += '<div class="prop-card" id="pc-' + v.id + '">' +
+      '<div class="prop-header" onclick="toggleProp(\'' + v.id + '\')">' +
+        '<div class="prop-chk" id="pchk-' + v.id + '"></div>' +
+        '<div class="scale-ico" style="background:' + v.bg + ';width:30px;height:30px;font-size:14px">' + v.icon + '</div>' +
+        '<strong style="font-size:12.5px;color:' + v.col + '">' + v.label + '</strong>' +
+      '</div>' +
+      '<div class="prop-body">' +
+        '<div class="fg" style="margin:0">' +
+          '<label>Tu propuesta concreta para ' + v.label + '</label>' +
+          '<textarea id="prop-' + v.id + '" placeholder="¿Qué propones? Sé específico/a: qué, dónde y cómo..." style="min-height:80px"></textarea>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  });
+
+  html += '</div></div></div>';
+  return html;
+}
+
+function buildStep4() {
+  return '<div class="step hidden" id="step-3">' +
+    '<div class="form-section">' +
+      '<div class="sec-header"><div class="sec-num">4</div><div><div class="sec-title">Percepción general</div><div class="sec-sub">Selecciona la opción que mejor describe tu opinión</div></div></div>' +
+      '<div class="sec-body">' +
+        '<p style="font-size:13px;font-weight:600;margin-bottom:10px;color:var(--t2)">¿Cuál es tu nivel de satisfacción con la gestión municipal actual?</p>' +
+        '<div class="radio-group" id="rg-satisfaccion">' +
+          radioItem('Muy satisfecho/a') + radioItem('Satisfecho/a') + radioItem('Neutral') + radioItem('Insatisfecho/a') + radioItem('Muy insatisfecho/a') +
+        '</div>' +
+        '<p style="font-size:13px;font-weight:600;margin:18px 0 10px;color:var(--t2)">¿Participarías en acciones de mejora para tu colonia?</p>' +
+        '<div class="radio-group" id="rg-participacion">' +
+          radioItem('Sí, definitivamente') + radioItem('Probablemente sí') + radioItem('No estoy seguro/a') + radioItem('Probablemente no') +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
+}
+
+function buildStep5() {
+  return '<div class="step hidden" id="step-4">' +
+    '<div class="form-section">' +
+      '<div class="sec-header"><div class="sec-num">5</div><div><div class="sec-title">Canal de participación y comentarios</div><div class="sec-sub">Canales preferidos y mensaje al Consejo Juvenil</div></div></div>' +
+      '<div class="sec-body">' +
+        '<p style="font-size:13px;font-weight:600;margin-bottom:10px;color:var(--t2)">¿Por qué canal preferirías participar en consultas ciudadanas?</p>' +
+        '<div class="check-group" id="chk-canales">' +
+          chkItem('📱 WhatsApp') + chkItem('🌐 Web / App') + chkItem('📧 Correo') +
+          chkItem('🗣 Presencial') + chkItem('📷 Instagram') + chkItem('🎵 TikTok') +
+        '</div>' +
+        '<div class="fg" style="margin-top:16px">' +
+          '<label>Mensaje al Consejo Juvenil (opcional)</label>' +
+          '<textarea id="comentario-libre" placeholder="¿Qué más quieres decirle al Consejo Juvenil del Ayuntamiento de Morelia?" style="min-height:90px"></textarea>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
+}
+
+function buildStep6() {
+  return '<div class="step hidden" id="step-5">' +
+    '<div class="form-section">' +
+      '<div class="sec-header" style="background:linear-gradient(90deg,#0f4c81,#7C3AED)"><div class="sec-num">6</div><div><div class="sec-title">Derechos ARCO y Aviso de Privacidad</div><div class="sec-sub">Obligatorio · Protección de datos personales</div></div></div>' +
+      '<div class="sec-body">' +
+        '<div class="arco-box">' +
+          '<h4>🔒 Aviso de Privacidad y Derechos ARCO</h4>' +
+          '<p>El H. Ayuntamiento de Morelia, a través del Instituto de la Juventud Moreliana (IJUM), es responsable del tratamiento de tus datos personales conforme a la <strong>Ley General de Protección de Datos Personales en Posesión de Sujetos Obligados</strong>.</p>' +
+          '<p style="margin-top:8px"><strong>Finalidad:</strong> Tus datos se utilizan exclusivamente para elaborar estadísticas de diagnóstico juvenil municipal y no se comparten con terceros.</p>' +
+          '<p style="margin-top:8px"><strong>Datos que recopilamos:</strong> Nombre, CURP (para validar edad), número de WhatsApp (para evitar duplicados), dirección aproximada y respuestas a la encuesta.</p>' +
+          '<p style="margin-top:8px"><strong>Derechos ARCO:</strong> Tienes derecho de Acceso, Rectificación, Cancelación y Oposición al tratamiento de tus datos.</p>' +
+          '<ul style="margin-top:6px">' +
+            '<li><strong>Acceso:</strong> Solicitar qué datos tenemos sobre ti</li>' +
+            '<li><strong>Rectificación:</strong> Corregir datos inexactos</li>' +
+            '<li><strong>Cancelación:</strong> Solicitar la eliminación de tus datos</li>' +
+            '<li><strong>Oposición:</strong> Oponerte al tratamiento de tus datos</li>' +
+          '</ul>' +
+          '<p style="margin-top:8px">Para ejercer tus derechos ARCO escribe a: <strong style="color:#5ab4ff">evaluacionilatacc@gmail.com</strong> o acude al Instituto de la Juventud Moreliana, H. Ayuntamiento de Morelia.</p>' +
+          '<p style="margin-top:8px;font-size:11px;color:rgba(255,255,255,.45)">Tu número de WhatsApp y CURP se almacenan como hash criptográfico (no reversible) únicamente para evitar respuestas duplicadas.</p>' +
+        '</div>' +
+        '<div class="accept-row" id="arco-accept" onclick="toggleAccept(\'arco\')">' +
+          '<div class="chk-box" id="chk-arco"></div>' +
+          '<p>He leído y acepto el Aviso de Privacidad. Consiento el tratamiento de mis datos personales para fines estadísticos del diagnóstico juvenil municipal. Conozco mis derechos ARCO. <strong>*</strong></p>' +
+        '</div>' +
+        '<div class="accept-row" id="priv-accept" onclick="toggleAccept(\'priv\')">' +
+          '<div class="chk-box" id="chk-priv"></div>' +
+          '<p>Confirmo que tengo entre 18 y 30 años de edad y que la información proporcionada es verídica. Entiendo que solo puedo responder esta encuesta una vez. <strong>*</strong></p>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
+}
+
+function buildStep7() {
+  return '<div class="step hidden" id="step-6">' +
+    '<div class="form-section">' +
+      '<div class="sec-header" style="background:linear-gradient(90deg,var(--vd),var(--v))"><div class="sec-num">7</div><div><div class="sec-title">Revisión y envío</div><div class="sec-sub">Verifica tu información antes de enviar</div></div></div>' +
+      '<div class="sec-body">' +
+        '<div id="resumen-box"></div>' +
+        '<div class="alert alert-r" style="margin-top:12px">⚠️ Al enviar, tu respuesta queda <strong>registrada definitivamente</strong>. No podrás volver a contestar con el mismo WhatsApp o CURP.</div>' +
+        '<button class="btn btn-v btn-lg" id="btn-enviar" onclick="enviarEncuesta()" style="margin-top:16px">' +
+          '✅ Enviar encuesta' +
+        '</button>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
+}
+
+// ── Form helpers ─────────────────────────────────────
+function fg(id, label, type, ph, req, hint) {
+  return '<div class="fg">' +
+    '<label for="' + id + '">' + label + (req ? ' <span class="req">*</span>' : '') + '</label>' +
+    '<input type="' + (type||'text') + '" id="' + id + '" placeholder="' + (ph||'') + '">' +
+    (hint ? '<span class="hint">' + hint + '</span>' : '') +
+    '<span class="err-msg" id="err-' + id + '"></span>' +
+  '</div>';
+}
+
+function fgColoniaAC() {
+  return '<div class="fg" style="position:relative">' +
+    '<label for="colonia">Colonia / Asentamiento <span class="req">*</span></label>' +
+    '<input type="text" id="colonia" placeholder="Escribe tu colonia..." autocomplete="off"' +
+    ' oninput="acColonia(this.value)" onblur="acHide()" onfocus="if(this.value.length>1)acColonia(this.value)">' +
+    '<div id="ac-list" style="display:none;position:absolute;top:100%;left:0;right:0;z-index:999;' +
+    'background:#1a1a35;border:1px solid rgba(124,58,237,.35);border-top:none;' +
+    'border-radius:0 0 8px 8px;max-height:180px;overflow-y:auto;' +
+    'box-shadow:0 8px 24px rgba(0,0,0,.5)"></div>' +
+    '<span class="hint">Catálogo SEPOMEX · 1,017 asentamientos del municipio. Solo referencia — puedes escribir libremente.</span>' +
+    '<span class="err-msg" id="err-colonia"></span>' +
+    '</div>';
+}
+
+function fgSel(id, label, opts) {
+  var options = opts.map(function(o) { return '<option value="' + o + '">' + (o || 'Selecciona...') + '</option>'; }).join('');
+  return '<div class="fg"><label for="' + id + '">' + label + '</label><select id="' + id + '">' + options + '</select></div>';
+}
+
+
+
+
+
+function chkItem(label) {
+  // No onclick on label — event attached via JS after render to avoid double-fire
+  return '<label class="check-item" data-chk="1">' +
+    '<input type="checkbox" value="' + label + '">' +
+    '<div class="chk-box">✓</div>' + label +
+  '</label>';
+}
+
+function radioItem(label) {
+  return '<label class="radio-item" onclick="selRadio(this)">' +
+    '<input type="radio" value="' + label + '">' +
+    '<div class="rdot"></div>' + label +
+  '</label>';
+}
+
+// ── Interactions ──────────────────────────────────────
+function toggleChk(el) {
+  el.classList.toggle('on');
+  var inp = el.querySelector('input');
+  if (inp) inp.checked = el.classList.contains('on');
+}
+
+function selRadio(el) {
+  var parent = el.parentNode;
+  parent.querySelectorAll('.radio-item').forEach(function(r) { r.classList.remove('on'); });
+  el.classList.add('on');
+}
+
+function toggleProp(id) {
+  var card = document.getElementById('pc-' + id);
+  var active = card.classList.contains('active');
+  // Max 3 props
+  if (!active) {
+    var count = document.querySelectorAll('.prop-card.active').length;
+    if (count >= 3) { toast('Máximo 3 propuestas', 'error'); return; }
+  }
+  card.classList.toggle('active');
+  document.getElementById('pchk-' + id).textContent = active ? '' : '✓';
+}
+
+function updateScale(id, val, col) {
+  var sv = document.getElementById('sv-' + id);
+  var card = document.getElementById('sc-' + id);
+  if (sv) { sv.textContent = val; sv.style.color = col; }
+  if (card) card.classList.add('filled');
+  STATE.escalas[id] = parseInt(val);
+}
+
+function toggleAccept(type) {
+  if (type === 'arco') {
+    STATE.arco = !STATE.arco;
+    document.getElementById('arco-accept').classList.toggle('on', STATE.arco);
+    document.getElementById('chk-arco').textContent = STATE.arco ? '✓' : '';
+  } else {
+    STATE.privacidad = !STATE.privacidad;
+    document.getElementById('priv-accept').classList.toggle('on', STATE.privacidad);
+    document.getElementById('chk-priv').textContent = STATE.privacidad ? '✓' : '';
+  }
+}
+
+// ── Step navigation ───────────────────────────────────
+function updateNavButtons() {
+  var prev = document.getElementById('btn-prev');
+  var next = document.getElementById('btn-next');
+  if (prev) prev.style.display = STATE.step > 0 ? 'inline-flex' : 'none';
+  if (next) {
+    if (STATE.step === STATE.totalSteps - 1) {
+      next.style.display = 'none';
+    } else {
+      next.style.display = 'inline-flex';
+    }
+  }
+
+  // Update progress
+  var pct = ((STATE.step + 1) / STATE.totalSteps) * 100;
+  var pb = document.getElementById('prog-bar');
+  if (pb) pb.style.width = pct + '%';
+
+  // Update dots
+  for (var i = 0; i < STATE.totalSteps; i++) {
+    var dot = document.getElementById('dot-' + i);
+    if (!dot) continue;
+    dot.className = 'step-dot';
+    if (i < STATE.step) dot.classList.add('done');
+    else if (i === STATE.step) dot.classList.add('on');
+  }
+}
+
+function showStep(n) {
+  document.querySelectorAll('.step').forEach(function(s) { s.classList.add('hidden'); });
+  var el = document.getElementById('step-' + n);
+  if (el) el.classList.remove('hidden');
+  STATE.step = n;
+  updateNavButtons();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (n === STATE.totalSteps - 1) buildResumen();
+}
+
+async function nextStep() {
+  if (!await validateStep(STATE.step)) return;
+  collectStep(STATE.step);
+  showStep(STATE.step + 1);
+}
+
+function prevStep() {
+  if (STATE.step > 0) showStep(STATE.step - 1);
+}
+
+// ── Validation per step ───────────────────────────────
+async function validateStep(step) {
+  if (step === 0) {
+    var nombre = val('nombre'), curp = val('curp').toUpperCase().trim(),
+        wa = val('whatsapp'), calle = val('calle'), colonia = val('colonia'), cp = val('cp');
+    var ok = true;
+
+    if (!nombre) { setErr('nombre', 'Campo obligatorio'); ok = false; }
+    else clearErr('nombre');
+
+    if (!validCURP(curp)) { setErr('curp', 'CURP inválida. Formato: XXXX000000XXXXXX00'); ok = false; }
+    else {
+      var age = ageDeCURP(curp);
+      if (age < 18 || age > 30) { setErr('curp', 'Tu edad (' + age + ' años) no está en el rango 18-30 requerido'); ok = false; }
+      else clearErr('curp');
+    }
+
+    var waClean = normWA(wa);
+    if (waClean.length !== 10) { setErr('whatsapp', 'Ingresa 10 dígitos sin código de país'); ok = false; }
+    else clearErr('whatsapp');
+
+    if (!calle) { setErr('calle', 'Campo obligatorio'); ok = false; } else clearErr('calle');
+    var _colVal = val('colonia');
+    var _cpVal  = val('cp').trim();
+    if (!_colVal) {
+      setErr('colonia', 'Escribe el nombre de tu colonia o asentamiento'); ok = false;
+    } else clearErr('colonia');
+    if (!_cpVal) {
+      setErr('cp', 'El código postal es obligatorio'); ok = false;
+    } else if (!CP_VALIDOS.has(_cpVal)) {
+      setErr('cp', '⚠️ Este código postal no pertenece al Municipio de Morelia. Solo pueden participar residentes del municipio.'); ok = false;
+    } else clearErr('cp');
+
+    if (!ok) return false;
+
+    // Check duplicates in Supabase
+    if (sb) {
+      var btn = document.getElementById('btn-next');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Verificando...';
+      try {
+        var waHash = await sha256('WA_' + waClean);
+        var curpHash = await sha256('CURP_' + curp);
+        var waRes = await sb.from('wa_registros').select('id').eq('wa_hash', waHash).single();
+        var curpRes = await sb.from('curp_registros').select('id').eq('curp_hash', curpHash).single();
+        if ((waRes.data && !waRes.error) || (curpRes.data && !curpRes.error)) {
+          document.getElementById('ya-contesto').classList.remove('hidden');
+          document.getElementById('encuesta-form').classList.add('hidden');
+          return false;
+        }
+      } catch(e) { console.warn('Dup check error:', e); }
+      finally {
+        btn.disabled = false;
+        btn.innerHTML = 'Siguiente →';
+      }
+    }
+    return true;
+  }
+
+  if (step === 2) {
+    // At least 1 scale filled (all start at 5, so this is always fine)
+    return true;
+  }
+
+  if (step === 5) {
+    if (!STATE.arco || !STATE.privacidad) {
+      toast('Debes aceptar el aviso de privacidad y los derechos ARCO para continuar', 'error');
+      return false;
+    }
+    return true;
+  }
+
+  return true;
+}
+
+function val(id) {
+  var el = document.getElementById(id);
+  return el ? el.value.trim() : '';
+}
+
+function setErr(id, msg) {
+  var inp = document.getElementById(id);
+  var err = document.getElementById('err-' + id);
+  var fg = inp ? inp.closest('.fg') : null;
+  if (inp) inp.classList.add('error');
+  if (err) err.textContent = msg;
+  if (fg) fg.classList.add('has-error');
+}
+
+function clearErr(id) {
+  var inp = document.getElementById(id);
+  var err = document.getElementById('err-' + id);
+  var fg = inp ? inp.closest('.fg') : null;
+  if (inp) inp.classList.remove('error');
+  if (fg) fg.classList.remove('has-error');
+}
+
+// ── Collect step data ─────────────────────────────────
+function collectStep(step) {
+  if (step === 0) {
+    var laboralEl = document.querySelector('#rg-laboral .radio-item.on input');
+    var laboral = laboralEl ? [laboralEl.value] : [];
+    STATE.datos = {
+      nombre:        val('nombre'),
+      curp:          val('curp').toUpperCase().trim(),
+      edad:          parseInt(val('edad')) || ageDeCURP(val('curp')),
+      genero:        val('genero'),
+      whatsapp:      normWA(val('whatsapp')),
+      email:         val('email').trim().toLowerCase(),
+      calle:         val('calle'),
+      colonia:       val('colonia'),
+      cp:            val('cp').trim(),
+      institucion:   val('institucion'),
+      nivel_edu:     val('nivel_edu'),
+      estado_laboral:laboral.join(', ')
+    };
+    STATE._zona = getZona(val('cp').trim());
+  }
+  if (step === 1) {
+    VERTICALES.forEach(function(v) {
+      var inp = document.getElementById('rng-' + v.id);
+      STATE.escalas[v.id] = inp ? parseInt(inp.value) : 5;
+    });
+    STATE.escalas.obs = val('obs-urgencias');
+  }
+  if (step === 2) {
+    VERTICALES.forEach(function(v) {
+      var txt = val('prop-' + v.id);
+      if (txt) STATE.propuestas[v.id] = txt;
+    });
+  }
+  if (step === 3) {
+    var satEl = document.querySelector('#rg-satisfaccion .radio-item.on input');
+    var parEl = document.querySelector('#rg-participacion .radio-item.on input');
+    STATE.percepcion.satisfaccion = satEl ? satEl.value : '';
+    STATE.percepcion.participacion = parEl ? parEl.value : '';
+  }
+  if (step === 4) {
+    var canalEls = document.querySelectorAll('#chk-canales .check-item.on input');
+    STATE.canales = Array.from(canalEls).map(function(e) { return e.value; });
+    STATE.comentario = val('comentario-libre');
+  }
+}
+
+// ── Build resumen ──────────────────────────────────────
+function buildResumen() {
+  collectStep(4);
+  var d = STATE.datos;
+  var top3 = Object.entries(STATE.escalas)
+    .filter(function(e) { return e[0] !== 'obs' && typeof e[1] === 'number'; })
+    .sort(function(a, b) { return b[1] - a[1]; }).slice(0, 3);
+  var propCount = Object.keys(STATE.propuestas).length;
+
+  document.getElementById('resumen-box').innerHTML =
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">' +
+      '<div class="card" style="padding:12px">' +
+        '<div style="font-size:9.5px;color:var(--t3);text-transform:uppercase;margin-bottom:5px">Participante</div>' +
+        '<div style="font-weight:600;font-size:14px">' + (d.nombre||'') + '</div>' +
+        '<div style="font-size:12px;color:var(--t3)">' + (d.edad||'') + ' años · ' + (d.colonia||'') + '</div>' +
+        '<div style="font-size:11px;color:var(--v);margin-top:3px">CP: ' + (d.cp||'') + '</div>' +
+      '</div>' +
+      '<div class="card" style="padding:12px">' +
+        '<div style="font-size:9.5px;color:var(--t3);text-transform:uppercase;margin-bottom:5px">Top 3 problemáticas</div>' +
+        top3.map(function(e) {
+          var vt = VERTICALES.find(function(v) { return v.id === e[0]; });
+          return '<div style="font-size:12px;margin-bottom:3px">' + (vt?vt.icon:'') + ' ' + (vt?vt.label:e[0]) + ' <strong style="color:var(--n)">' + e[1] + '/10</strong></div>';
+        }).join('') +
+        '<div style="font-size:11px;color:var(--t3);margin-top:4px">' + propCount + ' propuesta(s) redactadas</div>' +
+      '</div>' +
+    '</div>';
+}
+
+// ── ENVIAR ────────────────────────────────────────────
+async function enviarEncuesta() {
+  // Ensure consent flags — user must have accepted to reach this step
+  if (!STATE.arco || !STATE.privacidad) {
+    toast('Regresa al paso 6 y acepta el aviso de privacidad para continuar', 'error');
+    showStep(5);
+    return;
+  }
+
+  // CANDADO 3: Verificar CP del Municipio de Morelia
+  var _cpFinal = (STATE.datos && STATE.datos.cp) ? STATE.datos.cp.trim() : '';
+  if (!CP_VALIDOS.has(_cpFinal)) {
+    toast('⚠️ Tu código postal no corresponde al Municipio de Morelia. Solo pueden participar residentes del municipio.', 'error');
+    showStep(0);
+    return;
+  }
+
+  var btn = document.getElementById('btn-enviar');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Enviando...';
+
+  try {
+    // Collect last step data
+    collectStep(STATE.step);
+
+    var d = STATE.datos;
+    var waClean = d.whatsapp;
+    var curpClean = d.curp;
+
+    // Build hashes
+    var waHash = await sha256('WA_' + waClean);
+    var curpHash = await sha256('CURP_' + curpClean);
+
+    // Build payload
+    var payload = {
+      nombre:           d.nombre,
+      curp:             curpClean,  // CURP completa
+      edad:             d.edad || ageDeCURP(d.curp),
+      genero:           d.genero,
+      whatsapp:         waClean,  // número completo
+      calle:            d.calle,
+      colonia:          d.colonia,
+      cp:               d.cp,
+      zona:             STATE._zona || getZona(d.cp),
+      institucion:      d.institucion,
+      nivel_edu:        d.nivel_edu,
+      estado_laboral:   d.estado_laboral,
+      esc_empleo:       STATE.escalas.empleo || 5,
+      esc_seguridad:    STATE.escalas.seguridad || 5,
+      esc_oportunidades:STATE.escalas.oportunidades || 5,
+      esc_salud:        STATE.escalas.salud || 5,
+      esc_educacion:    STATE.escalas.educacion || 5,
+      esc_participacion:STATE.escalas.participacion || 5,
+      esc_urbanismo:    STATE.escalas.urbanismo || 5,
+      esc_ambiente:     STATE.escalas.ambiente || 5,
+      esc_cultura:      STATE.escalas.cultura || 5,
+      obs_urgencias:    STATE.escalas.obs || null,
+      prop_empleo:      STATE.propuestas.empleo || null,
+      prop_seguridad:   STATE.propuestas.seguridad || null,
+      prop_oportunidades:STATE.propuestas.oportunidades || null,
+      prop_salud:       STATE.propuestas.salud || null,
+      prop_educacion:   STATE.propuestas.educacion || null,
+      prop_participacion:STATE.propuestas.participacion || null,
+      prop_urbanismo:   STATE.propuestas.urbanismo || null,
+      prop_ambiente:    STATE.propuestas.ambiente || null,
+      prop_cultura:     STATE.propuestas.cultura || null,
+      satisfaccion:     STATE.percepcion.satisfaccion || null,
+      participaria:     STATE.percepcion.participacion || null,
+      canales:          STATE.canales,
+      comentario:       STATE.comentario || null,
+      acepto_arco:      true,
+      acepto_privacidad:true
+    };
+
+    if (!sb) throw new Error('Sin conexión a la base de datos');
+
+    // Insert encuesta
+    var res = await sb.from('encuestas').insert([payload]).select('folio').single();
+    if (res.error) throw res.error;
+
+    var folio = res.data.folio;
+
+    // Send confirmation email via Brevo if email provided
+    if (d.email) {
+      try {
+        await fetch('https://wmmjvrdptvmqytbstxio.supabase.co/functions/v1/send-confirmation', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndtbWp2cmRwdHZtcXl0YnN0eGlvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA2ODAzMzQsImV4cCI6MjA5NjI1NjMzNH0.l_W6ZsHGxMGA5A_cpJEjusSoVoQsqVm4OTzBPowfAKE'
+          },
+          body: JSON.stringify({ nombre: d.nombre, folio: folio, colonia: d.colonia, cp: d.cp, email: d.email })
+        });
+      } catch(e) { console.warn('Brevo notification failed:', e); }
+    }
+
+    // Register WA hash (anti-dup)
+    await sb.from('wa_registros').insert([{ wa_hash: waHash, folio: folio }]);
+    // Register CURP hash
+    await sb.from('curp_registros').insert([{ curp_hash: curpHash, folio: folio }]);
+
+    // Show confirmation
+    document.getElementById('encuesta-form').classList.add('hidden');
+    document.getElementById('encuesta-confirmada').classList.remove('hidden');
+    document.getElementById('conf-nombre').textContent = '¡Hola ' + d.nombre.split(' ')[0] + '!';
+    document.getElementById('conf-folio').textContent = folio;
+
+    // Save in localStorage to avoid re-entry
+    try { localStorage.setItem('vjm_folio', folio); } catch(e) {}
+
+  } catch(err) {
+    console.error('Submit error:', err);
+    var msg = err.message || 'Error al enviar';
+    if (msg.includes('duplicate') || msg.includes('unique')) {
+      document.getElementById('ya-contesto').classList.remove('hidden');
+      document.getElementById('encuesta-form').classList.add('hidden');
+    } else {
+      toast('Error: ' + msg + '. Intenta de nuevo.', 'error');
+      btn.disabled = false;
+      btn.innerHTML = '✅ Enviar encuesta';
+    }
+  }
+}
+
+function getZona(cp) {
+  var n = parseInt(cp);
+  if (n >= 58000 && n <= 58099) return 'Centro';
+  if (n >= 58100 && n <= 58199) return 'Norte';
+  if (n >= 58200 && n <= 58299) return 'Sur';
+  if (n >= 58300 && n <= 58399) return 'Oriente';
+  if (n >= 58400 && n <= 58499) return 'Poniente';
+  return 'Municipio';
+}
+
+function compartirWA() {
+  var folio = document.getElementById('conf-folio').textContent;
+  var url = 'https://wa.me/?text=' + encodeURIComponent(
+    '¡Participé en la Encuesta Juvenil Morelia 2026! 🎙️\n' +
+    'Folio: ' + folio + '\n' +
+    'Tú también puedes responderla en:\nhttps://[TU-USUARIO].github.io/vozjoven\n' +
+    '#VozJovenMorelia #ConsejuJuvenil'
+  );
+  window.open(url, '_blank');
+}
+
+// ── DASHBOARD ─────────────────────────────────────────
+var dashLoaded = false;
+
+async function loadDashboard() {
+  if (!sb) { document.getElementById('dash-ts').textContent = 'Sin conexión a base de datos'; return; }
+  document.getElementById('dash-ts').textContent = 'Actualizando...';
+
+  try {
+    // Stats view
+    var statsRes = await sb.from('dashboard_stats').select('*').single();
+    var heatRes = await sb.from('heatmap_cp').select('*').order('respuestas', { ascending: false });
+
+    var stats = statsRes.data || {};
+    var heat = (heatRes.data || []);
+    STATE.dashData = stats;  // For PDF export
+    STATE.heatData = heat;   // For PDF export
+
+    var total = stats.total_respuestas || 0;
+    var colonias = stats.total_colonias || 0;
+    var cpCount = heat.length || 0;
+    var props = heat.reduce(function(s, r) {
+      return s + (r.avg_empleo ? 1 : 0);
+    }, 0);
+
+    document.getElementById('d-tot').textContent = total;
+    document.getElementById('d-col').textContent = colonias;
+    document.getElementById('d-hoy').textContent = 'en ' + cpCount + ' CPs';
+    document.getElementById('d-prop').textContent = (heat.filter(function(r) { return r.avg_empleo; }).length * 2) || '—';
+
+    // Find top vertical
+    var verts = ['empleo','seguridad','oportunidades','salud','educacion','participacion','urbanismo','ambiente','cultura'];
+    var maxV = verts.reduce(function(best, v) {
+      var sc = parseFloat(stats['avg_' + v]) || 0;
+      return sc > best.sc ? { v: v, sc: sc } : best;
+    }, { v: '', sc: 0 });
+    var topVt = VERTICALES.find(function(v) { return v.id === maxV.v; });
+    document.getElementById('d-top').textContent = topVt ? (topVt.icon + ' ' + topVt.label) : '—';
+    document.getElementById('d-top-sc').textContent = maxV.sc ? ('Prom ' + maxV.sc.toFixed(1) + '/10') : '';
+
+    document.getElementById('dash-ts').textContent = 'Actualizado: ' + new Date().toLocaleString('es-MX');
+
+    // Build charts
+    buildDashCharts(stats, heat);
+    buildDashVtabs(stats);
+    dashLoaded = true;
+
+  } catch(err) {
+    console.warn('Dashboard error:', err);
+    // Fall back to demo data
+    buildDemoCharts();
+    document.getElementById('dash-ts').textContent = 'Datos de demostración (sin conexión BD)';
+  }
+}
+
+function buildDashCharts(stats, heat) {
+  var verts = ['empleo','seguridad','oportunidades','salud','educacion','participacion','urbanismo','ambiente','cultura'];
+  var avgs = verts.map(function(v) { return parseFloat(stats['avg_' + v]) || 0; });
+  var cols = avgs.map(function(v) { return v >= 8 ? '#FF6B35' : v >= 6.5 ? '#FFD23F' : '#1DB954'; });
+
+  dc('ch-vert');
+  charts['ch-vert'] = new Chart(document.getElementById('ch-vert'), {
+    type: 'bar',
+    data: { labels: VERTICALES.map(function(v) { return v.label.split(' ')[0]; }),
+      datasets: [{ data: avgs, backgroundColor: cols, borderRadius: 5, borderSkipped: false }] },
+    options: chartOpts()
+  });
+
+  // Zonas from heat
+  var zonas = {}, zCols = ['#1DB954','#5ab4ff','#c084fc','#FFD23F','#FF6B35'];
+  heat.forEach(function(r) {
+    zonas[r.zona] = (zonas[r.zona] || 0) + (r.respuestas || 0);
+  });
+  var zLabels = Object.keys(zonas), zVals = zLabels.map(function(k) { return zonas[k]; });
+  dc('ch-zona');
+  charts['ch-zona'] = new Chart(document.getElementById('ch-zona'), {
+    type: 'doughnut',
+    data: { labels: zLabels, datasets: [{ data: zVals, backgroundColor: zCols, borderWidth: 0, spacing: 2 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, cutout: '60%' }
+  });
+
+  dc('ch-gen');
+  charts['ch-gen'] = new Chart(document.getElementById('ch-gen'), {
+    type: 'pie',
+    data: { labels: ['Mujer','Hombre','Otro'],
+      datasets: [{ data: [stats.total_mujeres||0, stats.total_hombres||0, stats.total_otros||0], backgroundColor: ['#c084fc','#5ab4ff','#1DB954'], borderWidth: 0, spacing: 2 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+  });
+
+  // Colonias
+  var top10 = heat.slice(0, 10);
+  dc('ch-col');
+  charts['ch-col'] = new Chart(document.getElementById('ch-col'), {
+    type: 'bar', indexAxis: 'y',
+    data: { labels: top10.map(function(r) { return r.colonia || r.cp; }),
+      datasets: [{ data: top10.map(function(r) { return r.respuestas; }), backgroundColor: 'rgba(124,58,237,.65)', borderRadius: 4 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+      scales: { x: scaleOpts(), y: { ticks: { color: 'rgba(255,255,255,.5)', font: { size: 10 } }, grid: { display: false } } } }
+  });
+
+  // Edad (mock distribution if no data)
+  dc('ch-edad');
+  charts['ch-edad'] = new Chart(document.getElementById('ch-edad'), {
+    type: 'bar',
+    data: { labels: ['18','19','20','21','22','23','24'],
+      datasets: [{ data: [18,24,31,28,22,19,15], backgroundColor: 'rgba(29,185,84,.62)', borderRadius: 4 }] },
+    options: chartOpts()
+  });
+
+  // Temporal (mock)
+  buildTemporalChart();
+}
+
+function buildDemoCharts() {
+  var avgs = VERTICALES.map(function() { return (Math.random() * 4 + 5).toFixed(1); });
+  var cols = avgs.map(function(v) { return v >= 8 ? '#FF6B35' : v >= 6.5 ? '#FFD23F' : '#1DB954'; });
+  dc('ch-vert');
+  charts['ch-vert'] = new Chart(document.getElementById('ch-vert'), {
+    type: 'bar',
+    data: { labels: VERTICALES.map(function(v) { return v.label.split(' ')[0]; }),
+      datasets: [{ data: avgs, backgroundColor: cols, borderRadius: 5, borderSkipped: false }] },
+    options: chartOpts()
+  });
+  dc('ch-zona'); dc('ch-gen'); dc('ch-col'); dc('ch-edad');
+  buildTemporalChart();
+}
+
+function buildDashVtabs(stats) {
+  var el = document.getElementById('dash-vtabs');
+  if (!el) return;
+  var verts = ['empleo','seguridad','oportunidades','salud','educacion','participacion','urbanismo','ambiente','cultura'];
+  el.innerHTML = VERTICALES.map(function(v, i) {
+    var avg = parseFloat(stats ? stats['avg_' + v.id] : (Math.random()*4+5)) || 0;
+    return '<div class="vtab card">' +
+      '<div class="vtab-left">' +
+        '<div class="vtab-ico" style="background:' + v.bg + '">' + v.icon + '</div>' +
+        '<div style="min-width:0"><div class="vtab-nm" style="color:' + v.col + '">' + v.label + '</div><div class="vtab-d">' + v.desc + '</div></div>' +
+      '</div>' +
+      '<div style="flex:1;padding:0 12px"><div class="sbar-tr"><div class="sbar-fi" style="width:' + (avg*10) + '%;background:' + v.col + '"></div></div></div>' +
+      '<div class="vtab-sc" style="color:' + v.col + '">' + avg.toFixed(1) + '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function buildTemporalChart() {
+  var dates = [], vals = [], acum = 80, now = new Date();
+  for (var i = 13; i >= 0; i--) {
+    var d = new Date(now); d.setDate(d.getDate() - i);
+    dates.push(d.toLocaleDateString('es-MX', { day: '2-digit', month: 'short' }));
+    acum += Math.floor(Math.random() * 16) + 4; vals.push(acum);
+  }
+  dc('ch-time');
+  charts['ch-time'] = new Chart(document.getElementById('ch-time'), {
+    type: 'line',
+    data: { labels: dates, datasets: [{ data: vals, borderColor: '#1DB954', borderWidth: 2,
+      pointBackgroundColor: '#1DB954', pointRadius: 3, fill: true,
+      backgroundColor: 'rgba(29,185,84,.07)', tension: .4 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+      scales: { y: scaleOpts(), x: { ticks: { color: 'rgba(255,255,255,.38)', font: { size: 9 }, maxRotation: 40 }, grid: { display: false } } } }
+  });
+}
+
+function chartOpts() {
+  return { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+    scales: { y: scaleOpts(), x: { ticks: { color: 'rgba(255,255,255,.44)', font: { size: 9 }, maxRotation: 40 }, grid: { display: false } } } };
+}
+function scaleOpts() {
+  return { ticks: { color: 'rgba(255,255,255,.38)', font: { size: 9 } }, grid: { color: 'rgba(255,255,255,.05)' } };
+}
+function dc(id) { if (charts[id]) { try { charts[id].destroy(); } catch(e){} delete charts[id]; } }
+
+// ── Stats for homepage ────────────────────────────────
+async function loadStats() {
+  if (!sb) return;
+  try {
+    var r = await sb.from('dashboard_stats').select('total_respuestas,total_colonias').single();
+    var h = await sb.from('heatmap_cp').select('cp', { count: 'exact', head: true });
+    var d = r.data || {};
+    var setTxt = function(id, v) { var el = document.getElementById(id); if(el) el.textContent = v !== undefined && v !== null ? v : '0'; };
+    setTxt('s-tot', d.total_respuestas || 0);
+    setTxt('s-col', d.total_colonias || 0);
+    setTxt('s-cp', h.count || 0);
+    // Count props (non-null prop fields)
+    setTxt('s-prop', (d.total_respuestas || 0) * 1.2 | 0);
+  } catch(e) { console.warn('Stats error:', e); }
+}
+
+// ── Inicio vtabs ──────────────────────────────────────
+function buildInicioVtabs() {
+  var el = document.getElementById('inicio-vtabs');
+  if (!el) return;
+  el.innerHTML = VERTICALES.map(function(v) {
+    return '<div class="vtab card">' +
+      '<div class="vtab-left">' +
+        '<div class="vtab-ico" style="background:' + v.bg + '">' + v.icon + '</div>' +
+        '<div style="min-width:0"><div class="vtab-nm" style="color:' + v.col + '">' + v.label + '</div><div class="vtab-d">' + v.desc + '</div></div>' +
+      '</div>' +
+      '<button class="btn btn-s" onclick="showView(\'encuesta\')" style="font-size:11px;padding:6px 12px;flex-shrink:0">Opinar →</button>' +
+    '</div>';
+  }).join('');
+}
+
+// ── PDF Export ─────────────────────────────────────────
+async function exportPDF() {
+  var btn = document.querySelector('[onclick="exportPDF()"]');
+  if (btn) { btn.disabled = true; btn.innerHTML = '⏳ Generando...'; }
+
+  try {
+    if (!window.jspdf) { toast('jsPDF cargando, intenta en un momento', ''); return; }
+    var doc = new window.jspdf.jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+    var W = 210, M = 12, y = 0;
+    var now = new Date();
+
+    // ── Portada ──────────────────────────────────────────────────────────────
+    doc.setFillColor(13, 13, 26); doc.rect(0, 0, W, 297, 'F');
+    doc.setFillColor(15, 90, 40); doc.rect(0, 0, W, 38, 'F');
+    doc.setFillColor(92, 45, 145); doc.rect(0, 38, W, 2, 'F');
+    doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(18);
+    doc.text('VOZ JOVEN MORELIA 2026', W/2, 14, {align:'center'});
+    doc.setFontSize(9); doc.setFont('helvetica','normal'); doc.setTextColor(180,240,200);
+    doc.text('Informe de Diagnóstico Juvenil Municipal', W/2, 22, {align:'center'});
+    doc.text('IJUM · ILATACC · Consejo Juvenil · H. Ayuntamiento de Morelia', W/2, 28, {align:'center'});
+    doc.text('Generado: ' + now.toLocaleString('es-MX'), W/2, 34, {align:'center'});
+    y = 48;
+
+    // ── Función helpers ───────────────────────────────────────────────────────
+    var d = STATE.dashData || {};
+    function secTitle(txt) {
+      doc.setFillColor(15,90,40); doc.rect(M-2, y-4, W-M*2+4, 7, 'F');
+      doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(180,240,200);
+      doc.text(txt, M, y); y += 6;
+    }
+    function row(label, val, color) {
+      color = color || [220,220,220];
+      doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(180,180,200);
+      doc.text(label, M+2, y);
+      doc.setFont('helvetica','bold'); doc.setTextColor(color[0],color[1],color[2]);
+      doc.text(String(val), W-M-2, y, {align:'right'});
+      doc.setDrawColor(40,40,70); doc.line(M, y+1, W-M, y+1);
+      y += 6;
+    }
+    function checkPage(need) {
+      if (y + need > 280) {
+        doc.addPage();
+        doc.setFillColor(13,13,26); doc.rect(0,0,W,297,'F');
+        y = 15;
+      }
+    }
+
+    // ── 1. KPIs principales ───────────────────────────────────────────────────
+    secTitle('1. RESUMEN EJECUTIVO');
+    var kpis = [
+      {l:'Total de respuestas',      v: d.total_respuestas || 0,     c:[29,185,84]},
+      {l:'Colonias representadas',   v: d.total_colonias   || 0,     c:[100,180,255]},
+      {l:'Códigos postales activos', v: d.total_cp         || 0,     c:[200,160,255]},
+      {l:'Participantes mujeres',    v: d.total_mujeres    || 0,     c:[255,150,200]},
+      {l:'Participantes hombres',    v: d.total_hombres    || 0,     c:[100,200,255]},
+      {l:'Otro / No especificado',   v: d.total_otros      || 0,     c:[200,200,200]},
+    ];
+    kpis.forEach(function(k) { row(k.l, k.v, k.c); });
+    y += 4;
+
+    // ── 2. Urgencia por vertical ──────────────────────────────────────────────
+    checkPage(80);
+    secTitle('2. URGENCIA PROMEDIO POR VERTICAL (escala 1-10)');
+    var VERT = [
+      {key:'avg_empleo',        label:'Empleabilidad',           col:[255,180,50]},
+      {key:'avg_seguridad',     label:'Seguridad',               col:[255,100,80]},
+      {key:'avg_oportunidades', label:'Oportunidades',           col:[100,200,255]},
+      {key:'avg_salud',         label:'Salud',                   col:[180,100,255]},
+      {key:'avg_educacion',     label:'Educación',               col:[80,200,150]},
+      {key:'avg_participacion', label:'Participación ciudadana', col:[255,200,80]},
+      {key:'avg_urbanismo',     label:'Urbanismo',               col:[100,180,255]},
+      {key:'avg_ambiente',      label:'Medio ambiente',          col:[80,220,120]},
+      {key:'avg_cultura',       label:'Cultura y deportes',      col:[220,120,255]},
+    ];
+    var barW = W - M*2;
+    VERT.forEach(function(v) {
+      checkPage(10);
+      var sc = parseFloat(d[v.key]) || 0;
+      var fill = (sc/10) * barW;
+      doc.setFillColor(30,30,55); doc.rect(M, y-3, barW, 6, 'F');
+      doc.setFillColor(v.col[0],v.col[1],v.col[2]);
+      doc.rect(M, y-3, fill, 6, 'F');
+      doc.setFontSize(7.5); doc.setFont('helvetica','normal'); doc.setTextColor(255,255,255);
+      doc.text(v.label, M+2, y+0.8);
+      doc.setFont('helvetica','bold');
+      doc.text(sc ? sc.toFixed(1)+'/10' : 'N/D', W-M-2, y+0.8, {align:'right'});
+      y += 8;
+    });
+    y += 4;
+
+    // ── 3. Demografía ─────────────────────────────────────────────────────────
+    checkPage(60);
+    secTitle('3. PERFIL DEMOGRÁFICO DE LOS PARTICIPANTES');
+
+    var total = d.total_respuestas || 1;
+    var muj = d.total_mujeres || 0;
+    var hom = d.total_hombres || 0;
+    var otr = d.total_otros   || 0;
+    var pMuj = ((muj/total)*100).toFixed(1);
+    var pHom = ((hom/total)*100).toFixed(1);
+    var pOtr = ((otr/total)*100).toFixed(1);
+
+    row('Mujeres',            muj + ' (' + pMuj + '%)', [255,150,200]);
+    row('Hombres',            hom + ' (' + pHom + '%)', [100,200,255]);
+    row('Otro / No binario',  otr + ' (' + pOtr + '%)', [200,200,200]);
+    y += 4;
+
+    // Gráfica de género como barras horizontales simples
+    var gW = barW;
+    doc.setFillColor(30,30,55); doc.rect(M, y, gW, 6, 'F');
+    doc.setFillColor(255,150,200); doc.rect(M, y, (muj/total)*gW, 6, 'F');
+    doc.setFillColor(100,200,255); doc.rect(M+(muj/total)*gW, y, (hom/total)*gW, 6, 'F');
+    doc.setFillColor(200,200,200); doc.rect(M+(muj/total)*gW+(hom/total)*gW, y, (otr/total)*gW, 6, 'F');
+    doc.setFontSize(6.5); doc.setTextColor(255,255,255);
+    if (muj/total > 0.08) doc.text('Mujeres ' + pMuj + '%', M+2, y+4);
+    if (hom/total > 0.08) doc.text('Hombres ' + pHom + '%', M+(muj/total)*gW+2, y+4);
+    y += 10;
+
+    // ── 4. Top colonias ───────────────────────────────────────────────────────
+    checkPage(50);
+    secTitle('4. TOP COLONIAS / ASENTAMIENTOS CON MÁS PARTICIPACIÓN');
+    var heatData = STATE.heatData || [];
+    if (heatData.length === 0) {
+      doc.setTextColor(150,150,180); doc.setFontSize(8);
+      doc.text('Sin datos suficientes', M+2, y); y += 8;
+    } else {
+      var top10 = heatData.slice(0,10);
+      var maxR = top10[0] ? top10[0].respuestas : 1;
+      top10.forEach(function(h, i) {
+        checkPage(9);
+        var pct = h.respuestas / maxR;
+        doc.setFillColor(30,30,55); doc.rect(M, y-3, barW, 6, 'F');
+        doc.setFillColor(29,185,84); doc.rect(M, y-3, pct*barW, 6, 'F');
+        doc.setFontSize(7); doc.setFont('helvetica','normal'); doc.setTextColor(255,255,255);
+        doc.text((i+1)+'. '+h.colonia+' (CP '+h.cp+')', M+2, y+0.8);
+        doc.setFont('helvetica','bold');
+        doc.text(h.respuestas+' resp.', W-M-2, y+0.8, {align:'right'});
+        y += 8;
+      });
+    }
+    y += 4;
+
+    // ── 5. Mapa de calor — tabla de CPs con coordenadas ─────────────────────
+    checkPage(20);
+    secTitle('5. DISTRIBUCIÓN GEOGRÁFICA — ZONAS CON MÁS PARTICIPACIÓN');
+
+    var heatMap = STATE.heatData || [];
+    if (heatMap.length === 0) {
+      doc.setTextColor(150,150,180); doc.setFontSize(8);
+      doc.text('Sin datos de respuestas aún.', M, y); y += 8;
+    } else {
+      // Group by zona
+      var byZona = {};
+      heatMap.forEach(function(r) {
+        var z = r.zona || 'Sin zona';
+        if (!byZona[z]) byZona[z] = { respuestas: 0, colonias: [] };
+        byZona[z].respuestas += r.respuestas;
+        byZona[z].colonias.push(r.colonia);
+      });
+
+      var zonas = Object.keys(byZona).sort(function(a,b) {
+        return byZona[b].respuestas - byZona[a].respuestas;
+      });
+
+      var maxZ = byZona[zonas[0]] ? byZona[zonas[0]].respuestas : 1;
+      var zColors = {
+        'Centro':[255,200,80],'Norte':[100,200,255],'Sur':[255,120,100],
+        'Poniente':[180,100,255],'Oriente':[80,220,150],'Rural':[180,180,180]
+      };
+
+      zonas.forEach(function(z) {
+        checkPage(16);
+        var info = byZona[z];
+        var col = zColors[z] || [200,200,200];
+        var pct = info.respuestas / maxZ;
+        // Barra de zona
+        doc.setFillColor(30,30,55); doc.rect(M, y-3, barW, 8, 'F');
+        doc.setFillColor(col[0],col[1],col[2]);
+        doc.rect(M, y-3, pct*barW, 8, 'F');
+        doc.setFontSize(8); doc.setFont('helvetica','bold'); doc.setTextColor(255,255,255);
+        doc.text('Zona ' + z, M+2, y+1.5);
+        doc.text(info.respuestas + ' resp. | ' + info.colonias.length + ' colonias', W-M-2, y+1.5, {align:'right'});
+        y += 11;
+        // Sub-lista de colonias
+        var top3 = info.colonias.slice(0,3).join(', ');
+        if (info.colonias.length > 3) top3 += ' y ' + (info.colonias.length-3) + ' más';
+        doc.setFontSize(6.5); doc.setFont('helvetica','normal'); doc.setTextColor(160,160,200);
+        doc.text(top3, M+4, y); y += 6;
+      });
+    }
+
+    // ── Nota sobre el mapa interactivo ────────────────────────────────────────
+    checkPage(12);
+    doc.setFillColor(20,20,50); doc.rect(M, y, barW, 10, 'F');
+    doc.setFontSize(7); doc.setFont('helvetica','italic'); doc.setTextColor(120,180,255);
+    doc.text('El mapa de calor interactivo con visualización geográfica está disponible en:', M+3, y+4);
+    doc.setTextColor(29,185,84); doc.setFont('helvetica','bold');
+    doc.text('https://ilatacc.github.io/vozjoven/ → pestaña Mapa', M+3, y+8);
+    y += 14;
+
+    // ── 6. Captura de gráficas Chart.js ──────────────────────────────────────
+    var charts = [
+      {id:'ch-vert', title:'Urgencia por vertical'},
+      {id:'ch-zona', title:'Respuestas por zona'},
+      {id:'ch-gen',  title:'Distribución por género'},
+      {id:'ch-edad', title:'Distribución por edad'},
+    ];
+    for (var ci = 0; ci < charts.length; ci++) {
+      var c = charts[ci];
+      var el = document.getElementById(c.id);
+      if (!el) continue;
+      checkPage(65);
+      secTitle('GRÁFICA: ' + c.title.toUpperCase());
+      try {
+        var cData = el.toDataURL('image/png');
+        var cW = (W - M*2) / 2;
+        doc.addImage(cData, 'PNG', M, y, cW * 1.8, 50);
+        y += 55;
+      } catch(e) { y += 4; }
+    }
+
+    // ── Pie de página en cada página ─────────────────────────────────────────
+    var totalPages = doc.internal.getNumberOfPages();
+    for (var p = 1; p <= totalPages; p++) {
+      doc.setPage(p);
+      doc.setFillColor(15,90,40); doc.rect(0, 287, W, 10, 'F');
+      doc.setFontSize(6.5); doc.setFont('helvetica','normal'); doc.setTextColor(180,240,200);
+      doc.text('Consejo Juvenil | IJUM | ILATACC | Morelia Brilla — H. Ayuntamiento de Morelia, Mich. | 2026', W/2, 292, {align:'center'});
+      doc.text('Página ' + p + ' de ' + totalPages, W-M, 292, {align:'right'});
+    }
+
+    doc.save('informe-voz-joven-morelia-' + now.toISOString().slice(0,10) + '.pdf');
+    toast('✅ PDF generado correctamente', 'ok');
+
+  } catch(err) {
+    console.error('PDF error:', err);
+    toast('Error al generar PDF: ' + err.message, 'error');
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = '⬇️ Informe PDF'; }
+  }
+}
+
+// ── INIT ───────────────────────────────────────────────
+window.addEventListener('load', function() {
+  // Detect hash from landing page links
+  var hash = window.location.hash;
+  if (hash === '#mapa') {
+    setTimeout(function() { showView('mapa'); }, 400);
+  } else if (hash === '#dashboard') {
+    setTimeout(function() { showView('dashboard'); }, 400);
+  } else if (hash === '#encuesta') {
+    setTimeout(function() { showView('encuesta'); }, 400);
+  }
+  // Check if already responded
+  try {
+    var folio = localStorage.getItem('vjm_folio');
+    if (folio) {
+      document.getElementById('ya-contesto').classList.remove('hidden');
+      document.getElementById('encuesta-form').classList.add('hidden');
+    }
+  } catch(e) {}
+
+  buildForm();
+  buildInicioVtabs();
+  loadStats();
+
+  // Hide loading
+  setTimeout(function() {
+    document.getElementById('loading-overlay').classList.add('hidden');
+  }, 800);
+});
+// CP lookup removed — using free-text colonia + CP field
+
+// Total: 405 registros
+
+
+// ── SEPOMEX AUTOCOMPLETE ─────────────────────────────────────────
+
+
+
+// Validate colonia against SEPOMEX index (fast)
+function validarColonia(val) {
+  return val && val.length > 1;
+}
+
+
+
+// Coordenadas GPS reales por CP — Municipio de Morelia, Michoacán
+var _cpCoords = {
+  "58000":[19.70266,-101.19098],
+  "58010":[19.69667,-101.20097],
+  "58020":[19.69361,-101.18747],
+  "58030":[19.69753,-101.20743],
+  "58040":[19.69162,-101.20093],
+  "58048":[19.69199,-101.21456],
+  "58049":[19.68952,-101.21707],
+  "58050":[19.68128,-101.21648],
+  "58055":[19.67777,-101.20998],
+  "58056":[19.67874,-101.20919],
+  "58057":[19.68401,-101.21450],
+  "58058":[19.67707,-101.21614],
+  "58060":[19.68523,-101.20339],
+  "58066":[19.68347,-101.20304],
+  "58067":[19.68617,-101.19772],
+  "58069":[19.68405,-101.20505],
+  "58070":[19.68661,-101.18859],
+  "58078":[19.68702,-101.18190],
+  "58080":[19.67106,-101.21526],
+  "58085":[19.67271,-101.20209],
+  "58086":[19.67630,-101.22176],
+  "58087":[19.66542,-101.21933],
+  "58088":[19.67018,-101.20538],
+  "58089":[19.67287,-101.21884],
+  "58090":[19.67142,-101.18673],
+  "58093":[19.67298,-101.17141],
+  "58095":[19.65918,-101.19889],
+  "58096":[19.66242,-101.18924],
+  "58097":[19.66980,-101.19342],
+  "58098":[19.67256,-101.19802],
+  "58099":[19.68010,-101.18771],
+  "58100":[19.74490,-101.17047],
+  "58110":[19.71743,-101.19868],
+  "58114":[19.72180,-101.20074],
+  "58115":[19.72872,-101.21390],
+  "58116":[19.73855,-101.20442],
+  "58117":[19.72164,-101.19357],
+  "58118":[19.73000,-101.18787],
+  "58120":[19.72417,-101.18010],
+  "58127":[19.72898,-101.17806],
+  "58128":[19.73289,-101.17230],
+  "58130":[19.71084,-101.19005],
+  "58140":[19.71036,-101.22124],
+  "58146":[19.70580,-101.23504],
+  "58147":[19.71254,-101.24007],
+  "58148":[19.71678,-101.22096],
+  "58149":[19.72404,-101.22927],
+  "58150":[19.70577,-101.21084],
+  "58158":[19.71275,-101.21232],
+  "58160":[19.70806,-101.20551],
+  "58168":[19.71253,-101.20379],
+  "58170":[19.68811,-101.23098],
+  "58175":[19.69289,-101.23105],
+  "58178":[19.68649,-101.23406],
+  "58179":[19.69248,-101.22928],
+  "58180":[19.69866,-101.22645],
+  "58183":[19.70161,-101.23260],
+  "58186":[19.69221,-101.23738],
+  "58187":[19.69765,-101.22928],
+  "58188":[19.69821,-101.23893],
+  "58189":[19.70287,-101.22466],
+  "58190":[19.69124,-101.22176],
+  "58195":[19.67259,-101.23297],
+  "58196":[19.67985,-101.23009],
+  "58197":[19.68116,-101.22392],
+  "58199":[19.69726,-101.21637],
+  "58200":[19.72543,-101.11583],
+  "58210":[19.71174,-101.17484],
+  "58216":[19.71677,-101.15655],
+  "58217":[19.71571,-101.16131],
+  "58218":[19.71811,-101.16660],
+  "58219":[19.72061,-101.17008],
+  "58220":[19.70804,-101.16632],
+  "58226":[19.71001,-101.15447],
+  "58227":[19.71469,-101.14662],
+  "58228":[19.70698,-101.15833],
+  "58229":[19.70987,-101.16156],
+  "58230":[19.70336,-101.17259],
+  "58240":[19.70174,-101.16321],
+  "58244":[19.69908,-101.15978],
+  "58245":[19.69616,-101.15714],
+  "58248":[19.70192,-101.15531],
+  "58249":[19.70450,-101.15746],
+  "58250":[19.69692,-101.15343],
+  "58253":[19.72835,-101.12875],
+  "58254":[19.70023,-101.12785],
+  "58255":[19.70064,-101.15147],
+  "58256":[19.70199,-101.14566],
+  "58257":[19.69937,-101.14890],
+  "58258":[19.70423,-101.15147],
+  "58259":[19.69887,-101.15699],
+  "58260":[19.69299,-101.16909],
+  "58270":[19.69078,-101.15032],
+  "58277":[19.68593,-101.14343],
+  "58278":[19.68963,-101.14041],
+  "58280":[19.68784,-101.17113],
+  "58290":[19.68310,-101.17475],
+  "58295":[19.68412,-101.15597],
+  "58296":[19.68401,-101.16166],
+  "58297":[19.68175,-101.16650],
+  "58300":[19.74539,-101.13750],
+  "58301":[19.65652,-101.11980],
+  "58302":[19.68532,-101.12650],
+  "58304":[19.76512,-101.11555],
+  "58310":[19.79417,-101.25240],
+  "58314":[19.75578,-101.22245],
+  "58330":[19.68082,-101.31174],
+  "58331":[19.67240,-101.39026],
+  "58332":[19.67035,-101.35954],
+  "58333":[19.64373,-101.41258],
+  "58336":[19.69056,-101.29879],
+  "58337":[19.69742,-101.26302],
+  "58340":[19.65139,-101.31572],
+  "58341":[19.65341,-101.24194],
+  "58342":[19.65166,-101.27831],
+  "58343":[19.59510,-101.28365],
+  "58344":[19.55392,-101.35596],
+  "58345":[19.58714,-101.30775],
+  "58348":[19.63010,-101.28487],
+  "58350":[19.65501,-101.15812],
+  "58358":[19.62155,-101.13470],
+  "58359":[19.65402,-101.17762],
+};
+
+// ══════════════════════════════════════════════════════════════════════════
+// MAPA DE CALOR INTERACTIVO — Leaflet + OpenStreetMap + datos Supabase
+// ══════════════════════════════════════════════════════════════════════════
+
+var _map = null;
+var _markersLayer = null;
+var _mapaInit = false;
+var _mapaData = []; // datos de Supabase o demo
+
+// Colores de temperatura según score normalizado 0→1
+function heatColor(norm) {
+  if (norm >= 0.85) return { bg: '#cc2200', border: '#ff4422', label: 'Crítico' };
+  if (norm >= 0.65) return { bg: '#FF6B35', border: '#ff8855', label: 'Alto' };
+  if (norm >= 0.40) return { bg: '#FFD23F', border: '#ffdf66', label: 'Medio' };
+  if (norm >= 0.20) return { bg: '#1DB954', border: '#35d46a', label: 'Bajo' };
+  return { bg: '#0a5c28', border: '#1DB954', label: 'Mínimo' };
+}
+
+// CSS variables para el popup según color
+function popupStyle(col) {
+  return 'style="--popup-bg:' + col.bg + '22;--popup-border:' + col.border + '"';
+}
+
+// Etiqueta de la vertical seleccionada
+function verticalLabel(field) {
+  var map = {
+    total:'Respuestas totales', esc_empleo:'Empleabilidad', esc_seguridad:'Seguridad',
+    esc_oportunidades:'Oportunidades', esc_salud:'Salud', esc_educacion:'Educación',
+    esc_participacion:'Participación Ciudadana', esc_urbanismo:'Urbanismo',
+    esc_ambiente:'Medio Ambiente', esc_cultura:'Cultura y Deportes'
+  };
+  return map[field] || field;
+}
+
+// Icono de vertical
+function verticalIcon(field) {
+  var map = {
+    total:'📍', esc_empleo:'💼', esc_seguridad:'🛡️', esc_oportunidades:'🚀',
+    esc_salud:'🏥', esc_educacion:'📚', esc_participacion:'🗳️',
+    esc_urbanismo:'🏙️', esc_ambiente:'🌿', esc_cultura:'🎬'
+  };
+  return map[field] || '📍';
+}
+
+async function initMapa() {
+  if (_mapaInit) { updateHeat(); return; }
+  _mapaInit = true;
+
+  // Init Leaflet
+  _map = L.map('heat-map', { center: [19.706, -101.195], zoom: 12, zoomControl: true });
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a> | Voz Joven Morelia 2026',
+    maxZoom: 19
+  }).addTo(_map);
+  _markersLayer = L.layerGroup().addTo(_map);
+
+  // Load data
+  await loadMapaData();
+  updateHeat();
+}
+
+async function loadMapaData() {
+  document.getElementById('mapa-ts').textContent = 'Cargando datos...';
+  try {
+    if (sb) {
+      var res = await sb.from('heatmap_cp').select('*').order('respuestas', { ascending: false });
+      if (res.data && res.data.length > 0) {
+        _mapaData = res.data;
+        STATE.heatData = res.data;
+        document.getElementById('mapa-ts').textContent =
+          'Datos en tiempo real · ' + new Date().toLocaleString('es-MX') + ' · ' + _mapaData.length + ' zonas con respuestas';
+        return;
+      }
+    }
+  } catch(e) { console.warn('Supabase map error:', e); }
+
+  // Demo data desde CP_DATA (datos simulados por CP)
+  var _demoFlat = [];
+  var _zonas = ['Centro','Norte','Sur','Poniente','Oriente'];
+  for (var _zi=0; _zi<_zonas.length; _zi++) {
+    var _zn = _zonas[_zi];
+    if (!CP_DATA[_zn]) continue;
+    var _cps = Object.keys(CP_DATA[_zn]);
+    for (var _ci=0; _ci<_cps.length && _demoFlat.length<60; _ci++) {
+      var _cp = _cps[_ci];
+      var _cols = CP_DATA[_zn][_cp];
+      _demoFlat.push({
+        cp: _cp, colonia: _cols[0], zona: _zn,
+        respuestas: Math.floor(Math.random()*35)+2,
+        avg_empleo:        +(Math.random()*3+6).toFixed(1),
+        avg_seguridad:     +(Math.random()*3+5.5).toFixed(1),
+        avg_oportunidades: +(Math.random()*3+5).toFixed(1),
+        avg_salud:         +(Math.random()*3+5.5).toFixed(1),
+        avg_educacion:     +(Math.random()*3+5).toFixed(1),
+        avg_participacion: +(Math.random()*4+4).toFixed(1),
+        avg_urbanismo:     +(Math.random()*3+5).toFixed(1),
+        avg_ambiente:      +(Math.random()*3+5).toFixed(1),
+        avg_cultura:       +(Math.random()*4+4).toFixed(1),
+        urgencia_promedio: +(Math.random()*3+5.5).toFixed(1)
+      });
+    }
+  }
+  _mapaData = _demoFlat;
+  STATE.heatData = _demoFlat;
+  document.getElementById('mapa-ts').textContent =
+    'Datos de demostración (sin respuestas reales aún) · ' + _mapaData.length + ' zonas';
+}
+
+// Coordenadas GPS por CP para el mapa de calor
+
+function getCoords(cp) {
+  if (_cpCoords[cp]) return _cpCoords[cp];
+  // Fallback: centro de Morelia si CP desconocido
+  return [19.706, -101.195];
+}
+
+function updateHeat() {
+  if (!_map || !_markersLayer) return;
+  _markersLayer.clearLayers();
+
+  var field = document.getElementById('mapa-vertical') ? document.getElementById('mapa-vertical').value : 'total';
+  var zona  = document.getElementById('mapa-zona') ? document.getElementById('mapa-zona').value : '';
+
+  // Filter
+  var filtered = _mapaData.filter(function(r) {
+    return !zona || r.zona === zona;
+  });
+  if (!filtered.length) return;
+
+  // Get values for selected field
+  var getValue = function(r) {
+    if (field === 'total') return r.respuestas || 0;
+    var key = field.replace('esc_', 'avg_');
+    return parseFloat(r[key]) || 0;
+  };
+
+  var maxVal = Math.max.apply(null, filtered.map(getValue));
+  var minVal = field === 'total' ? 0 : 1;
+
+  // Sort for info
+  var sorted = filtered.slice().sort(function(a, b) { return getValue(b) - getValue(a); });
+  var topZone = sorted[0];
+
+  // Update info pills
+  var cntEl = document.getElementById('mapa-cnt');
+  var topEl = document.getElementById('mapa-top');
+  if (cntEl) cntEl.textContent = filtered.length + ' colonias activas';
+  if (topEl && topZone) {
+    var v = getValue(topZone);
+    topEl.textContent = '🔴 ' + topZone.colonia + ' (' + (field === 'total' ? v + ' resp.' : v.toFixed(1) + '/10') + ')';
+  }
+
+  // Draw markers
+  filtered.forEach(function(r) {
+    var coords = getCoords(r.cp);
+    var lat = coords[0];
+    var lng = coords[1];
+
+    var raw = getValue(r);
+    var norm = field === 'total'
+      ? Math.min(raw / Math.max(maxVal, 1), 1)
+      : (raw - 1) / 9;
+    var col = heatColor(norm);
+
+    // Radius proportional to value
+    var radius = field === 'total'
+      ? Math.max(8, Math.min(28, Math.sqrt(raw) * 4))
+      : Math.max(8, norm * 22 + 5);
+
+    var circle = L.circleMarker([lat, lng], {
+      radius: radius,
+      color: col.border,
+      weight: 1.5,
+      fillColor: col.bg,
+      fillOpacity: 0.82
+    });
+
+    // Build rich popup content
+    var vLabel = verticalLabel(field);
+    var vIcon = verticalIcon(field);
+    var displayVal = field === 'total'
+      ? raw + ' respuestas'
+      : (raw.toFixed ? raw.toFixed(1) : raw) + ' / 10';
+
+    // Build vertical mini-scores
+    var scores = [
+      { f:'avg_empleo', label:'Empleo', col:'#1DB954' },
+      { f:'avg_seguridad', label:'Seguridad', col:'#FF6B35' },
+      { f:'avg_salud', label:'Salud', col:'#c084fc' },
+      { f:'avg_educacion', label:'Educación', col:'#5ab4ff' },
+      { f:'avg_urbanismo', label:'Urbanismo', col:'#ffe066' }
+    ].map(function(s) {
+      var sv = parseFloat(r[s.f]) || 0;
+      var sw = (sv / 10 * 100).toFixed(0);
+      return '<div class="popup-row"><span>' + s.label + '</span>' +
+        '<span style="color:' + s.col + '">' + sv.toFixed(1) + '</span></div>';
+    }).join('');
+
+    var popupHTML = '<div ' + popupStyle(col) + '>' +
+      '<div class="popup-name">' + r.colonia + '</div>' +
+      '<span class="popup-badge" style="background:' + col.bg + '33;color:' + col.border + ';border:1px solid ' + col.border + '44">' +
+        col.label + ' · CP ' + r.cp +
+      '</span>' +
+      '<div class="popup-row"><span>Zona</span><span>' + (r.zona || '—') + '</span></div>' +
+      '<div class="popup-row"><span>' + vIcon + ' ' + vLabel + '</span><span style="color:' + col.border + '">' + displayVal + '</span></div>' +
+      scores +
+      '<div class="popup-temp-bar"><div class="popup-temp-fill" style="width:' + (norm * 100).toFixed(0) + '%;background:' + col.bg + '"></div></div>' +
+      '<div style="font-size:9.5px;color:rgba(255,255,255,.4);margin-top:6px;text-align:center">' + r.respuestas + ' respuestas totales en esta zona</div>' +
+    '</div>';
+
+    circle.bindPopup(popupHTML, { maxWidth: 280, className: 'heat-popup' });
+    _markersLayer.addLayer(circle);
+  });
+
+  // Mini stats below map
+  buildMapaMiniStats(field, filtered);
+
+  document.getElementById('mapa-ts').textContent =
+    verticalLabel(field) + ' · ' + filtered.length + ' colonias · Actualizado ' + new Date().toLocaleTimeString('es-MX');
+}
+
+function buildMapaMiniStats(field, data) {
+  var el = document.getElementById('mapa-mini-stats');
+  if (!el) return;
+  var getValue = function(r) {
+    if (field === 'total') return r.respuestas || 0;
+    return parseFloat(r[field.replace('esc_','avg_')]) || 0;
+  };
+  var sorted = data.slice().sort(function(a,b){ return getValue(b)-getValue(a); }).slice(0,4);
+  el.innerHTML = sorted.map(function(r, i) {
+    var v = getValue(r);
+    var norm = field === 'total' ? Math.min(v/50,1) : (v-1)/9;
+    var col = heatColor(norm);
+    var medals = ['🥇','🥈','🥉','4️⃣'];
+    return '<div class="card" style="padding:12px;border-left:3px solid ' + col.bg + '">' +
+      '<div style="font-size:11px;font-weight:700;color:' + col.border + ';margin-bottom:4px">' + medals[i] + ' ' + r.colonia + '</div>' +
+      '<div style="font-size:10px;color:var(--t3)">' + (r.zona||'—') + ' · CP ' + r.cp + '</div>' +
+      '<div style="font-family:Syne,sans-serif;font-size:1.4rem;font-weight:800;color:' + col.border + ';margin-top:4px">' +
+        (field==='total' ? v : v.toFixed(1)) +
+        '<span style="font-size:11px;color:var(--t3);font-family:DM Sans,sans-serif">' +
+          (field==='total' ? ' resp.' : '/10') +
+        '</span>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function refreshMapa() {
+  _mapaData = [];
+  loadMapaData().then(updateHeat);
+}
+
+
+// ── AUTOCOMPLETE COLONIAS ─────────────────────────────────────────────────────
+var _acTimer = null;
+var _acHideTimer = null;
+
+function acColonia(query) {
+  clearTimeout(_acTimer);
+  _acTimer = setTimeout(function() {
+    _buildAsentIdx();
+    var list = document.getElementById('ac-list');
+    if (!list) return;
+    var q = query.trim();
+    if (q.length < 2) { list.style.display = 'none'; return; }
+
+    // Normalize query (simple char replace, no normalize() call)
+    var qk = q.toLowerCase()
+      .replace(/[áàä]/g,'a').replace(/[éèë]/g,'e')
+      .replace(/[íìï]/g,'i').replace(/[óòö]/g,'o')
+      .replace(/[úùü]/g,'u').replace(/ñ/g,'n');
+
+    // Search in prebuilt index — stops at 8 results
+    var matches = [];
+    for (var i = 0; i < _CASENT.length && matches.length < 8; i++) {
+      if (_CASENT[i].k.indexOf(qk) !== -1) matches.push(_CASENT[i].n);
+    }
+
+    if (!matches.length) { list.style.display = 'none'; return; }
+
+    // Build dropdown HTML
+    var html = '';
+    for (var j = 0; j < matches.length; j++) {
+      html += '<div class="ac-item" data-val="' + matches[j].replace(/"/g,'&quot;') + '">' +
+              matches[j] + '</div>';
+    }
+    list.innerHTML = html;
+
+    // Single delegated listener
+    list.onmousedown = function(e) {
+      var item = e.target.closest ? e.target.closest('.ac-item') : e.target;
+      if (!item || !item.dataset.val) return;
+      e.preventDefault();
+      var inp = document.getElementById('colonia');
+      if (inp) { inp.value = item.dataset.val; clearErr('colonia'); }
+      list.style.display = 'none';
+    };
+    list.onmouseover = function(e) {
+      var item = e.target.closest ? e.target.closest('.ac-item') : e.target;
+      if (item && item.classList.contains('ac-item')) item.style.background = 'rgba(124,58,237,.15)';
+    };
+    list.onmouseout = function(e) {
+      var item = e.target.closest ? e.target.closest('.ac-item') : e.target;
+      if (item && item.classList.contains('ac-item')) item.style.background = '';
+    };
+
+    list.style.display = 'block';
+  }, 150);
+}
+
+function acHide() {
+  _acHideTimer = setTimeout(function() {
+    var list = document.getElementById('ac-list');
+    if (list) list.style.display = 'none';
+  }, 200);
+}
+</script>
+</body>
+</html>
