@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Admin — Voz Joven Morelia 2026</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0d0d1a;--card:#13132a;--v:#1DB954;--p:#7C3AED;--t1:#e8e8f5;--t3:#888;--r:10px}
+body{background:var(--bg);color:var(--t1);font-family:'Segoe UI',Arial,sans-serif;min-height:100vh}
+
+/* LOGIN */
+#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+.login-box{background:var(--card);border:1px solid rgba(124,58,237,.3);border-radius:16px;padding:40px;width:100%;max-width:380px;text-align:center}
+.login-box h1{font-size:1.4rem;margin-bottom:6px;color:var(--v)}
+.login-box p{font-size:12px;color:var(--t3);margin-bottom:28px}
+.login-box input{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:8px;color:var(--t1);font-size:15px;padding:12px 14px;outline:none;margin-bottom:12px}
+.login-box input:focus{border-color:var(--p)}
+.btn-login{width:100%;background:var(--p);border:none;border-radius:8px;color:#fff;cursor:pointer;font-size:14px;font-weight:700;padding:13px;transition:.2s}
+.btn-login:hover{background:#6d28d9}.btn-login:disabled{opacity:.5;cursor:not-allowed}
+.login-err{color:#ff6b6b;font-size:12px;margin-top:10px;min-height:18px}
+.login-warn{color:#ffd23f;font-size:11px;margin-top:6px}
+.attempts-bar{height:3px;background:rgba(255,255,255,.1);border-radius:2px;margin:10px 0}
+.attempts-fill{height:100%;border-radius:2px;background:#ff6b6b;transition:width .3s}
+.shield{font-size:2.5rem;margin-bottom:16px}
+
+/* ADMIN PANEL */
+#admin-panel{display:none;padding:20px}
+.adm-header{background:var(--card);border-bottom:2px solid var(--p);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;margin:-20px -20px 20px;flex-wrap:wrap;gap:10px}
+.adm-header h1{font-size:1.1rem;color:var(--v)}
+.adm-header-right{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:none;border-radius:7px;cursor:pointer;font-size:12px;font-weight:700;padding:8px 14px;transition:.2s}
+.btn-v{background:var(--v);color:#000}.btn-v:hover{opacity:.85}
+.btn-p{background:var(--p);color:#fff}.btn-p:hover{opacity:.85}
+.btn-r{background:#cc2200;color:#fff}.btn-r:hover{opacity:.85}
+.btn-s{background:rgba(255,255,255,.08);color:var(--t1)}.btn-s:hover{background:rgba(255,255,255,.14)}
+
+/* Stats row */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:18px}
+.stat-card{background:var(--card);border-radius:var(--r);padding:14px;text-align:center;border:1px solid rgba(255,255,255,.06)}
+.stat-card .num{font-size:1.8rem;font-weight:800;color:var(--v)}
+.stat-card .lbl{font-size:10px;color:var(--t3);margin-top:3px}
+
+/* Filters */
+.filters{background:var(--card);border-radius:var(--r);padding:14px;margin-bottom:14px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.filters select,.filters input{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:6px;color:var(--t1);font-size:12px;padding:7px 10px;outline:none}
+.filters select option{background:#1a1a35}
+.filters label{font-size:11px;color:var(--t3)}
+
+/* Table */
+.table-wrap{overflow-x:auto;border-radius:var(--r);border:1px solid rgba(255,255,255,.06)}
+table{width:100%;border-collapse:collapse;font-size:11.5px}
+th{background:#1a1a35;color:var(--t3);font-weight:600;padding:10px 8px;text-align:left;white-space:nowrap;position:sticky;top:0;z-index:1;cursor:pointer;user-select:none}
+th:hover{color:var(--v)}
+tr:nth-child(even){background:rgba(255,255,255,.02)}
+tr:hover{background:rgba(124,58,237,.08)}
+td{padding:8px;border-bottom:1px solid rgba(255,255,255,.04);white-space:nowrap;max-width:180px;overflow:hidden;text-overflow:ellipsis}
+.badge{border-radius:4px;font-size:10px;font-weight:700;padding:2px 7px;white-space:nowrap}
+.badge-v{background:rgba(29,185,84,.15);color:#1DB954}
+.badge-p{background:rgba(124,58,237,.15);color:#c084fc}
+.badge-r{background:rgba(255,107,53,.15);color:#ff6b35}
+.folio{color:var(--v);font-family:monospace;font-size:11px}
+.pagination{display:flex;gap:6px;align-items:center;margin-top:12px;justify-content:center;flex-wrap:wrap}
+.pg-btn{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:6px;color:var(--t1);cursor:pointer;font-size:12px;padding:6px 12px}
+.pg-btn:hover{background:rgba(124,58,237,.2)}.pg-btn.on{background:var(--p);border-color:var(--p)}
+.status-bar{font-size:11px;color:var(--t3);margin-top:8px;text-align:center}
+.session-info{font-size:10px;color:var(--t3)}
+.no-data{text-align:center;padding:40px;color:var(--t3)}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════ LOGIN ════════════════════════════════ -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="shield">🛡️</div>
+    <h1>Panel Administrativo</h1>
+    <p>Voz Joven Morelia 2026 · Acceso restringido<br>Solo personal autorizado IJUM · ILATACC</p>
+    <div class="attempts-bar"><div class="attempts-fill" id="att-bar" style="width:0%"></div></div>
+    <input type="password" id="pw-input" placeholder="Contraseña de administrador"
+           onkeydown="if(event.key==='Enter')tryLogin()">
+    <button class="btn-login" id="btn-login" onclick="tryLogin()">🔐 Acceder</button>
+    <div class="login-err" id="login-err"></div>
+    <div class="login-warn" id="login-warn"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ PANEL ════════════════════════════════ -->
+<div id="admin-panel">
+
+  <div class="adm-header">
+    <div>
+      <h1>🛡️ Panel Administrativo — Voz Joven Morelia 2026</h1>
+      <span class="session-info" id="session-info"></span>
+    </div>
+    <div class="adm-header-right">
+      <button class="btn btn-v" onclick="exportCSV()">⬇️ CSV</button>
+      <button class="btn btn-v" onclick="exportExcel()">⬇️ Excel</button>
+      <button class="btn btn-s" onclick="loadData()">🔄 Actualizar</button>
+      <button class="btn btn-r" onclick="logout()">🚪 Cerrar sesión</button>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row" id="adm-stats"></div>
+
+  <!-- Filters -->
+  <div class="filters">
+    <label>Zona:
+      <select id="f-zona" onchange="applyFilters()">
+        <option value="">Todas</option>
+        <option>Centro</option><option>Norte</option><option>Sur</option>
+        <option>Poniente</option><option>Oriente</option><option>Rural</option>
+      </select>
+    </label>
+    <label>Género:
+      <select id="f-gen" onchange="applyFilters()">
+        <option value="">Todos</option>
+        <option>Mujer</option><option>Hombre</option>
+        <option value="otro">Otro / No binario</option>
+      </select>
+    </label>
+    <label>CP:
+      <input type="text" id="f-cp" placeholder="58147" maxlength="5" oninput="applyFilters()" style="width:70px">
+    </label>
+    <label>Buscar:
+      <input type="text" id="f-search" placeholder="Nombre, colonia, folio..." oninput="applyFilters()" style="width:180px">
+    </label>
+    <button class="btn btn-s" onclick="clearFilters()">✕ Limpiar</button>
+    <span id="f-count" style="font-size:11px;color:var(--v);margin-left:auto"></span>
+  </div>
+
+  <!-- Table -->
+  <div class="table-wrap">
+    <table id="adm-table">
+      <thead>
+        <tr>
+          <th onclick="sortBy('folio')">Folio</th>
+          <th onclick="sortBy('created_at')">Fecha</th>
+          <th onclick="sortBy('nombre')">Nombre</th>
+          <th onclick="sortBy('edad')">Edad</th>
+          <th onclick="sortBy('genero')">Género</th>
+          <th onclick="sortBy('colonia')">Colonia</th>
+          <th onclick="sortBy('cp')">CP</th>
+          <th onclick="sortBy('zona')">Zona</th>
+          <th>WhatsApp</th><th>Email</th>
+          <th>Nivel edu.</th>
+          <th>Laboral</th>
+          <th onclick="sortBy('esc_empleo')">Empleo</th>
+          <th onclick="sortBy('esc_seguridad')">Segur.</th>
+          <th onclick="sortBy('esc_salud')">Salud</th>
+          <th onclick="sortBy('esc_educacion')">Educ.</th>
+          <th onclick="sortBy('esc_urbanismo')">Urban.</th>
+          <th onclick="sortBy('esc_ambiente')">Amb.</th>
+          <th onclick="sortBy('esc_cultura')">Cult.</th>
+          <th onclick="sortBy('esc_participacion')">Partic.</th>
+          <th onclick="sortBy('esc_oportunidades')">Opor.</th>
+          <th>Satisfacción</th>
+          <th>Canales</th>
+          <th>Comentario</th>
+          <th>Prop. Empleo</th>
+          <th>Prop. Seguridad</th>
+          <th>Prop. Salud</th>
+          <th>Prop. Educación</th>
+          <th>Prop. Oportunidades</th>
+          <th>Prop. Participación</th>
+          <th>Prop. Urbanismo</th>
+          <th>Prop. Ambiente</th>
+          <th>Prop. Cultura</th>
+        </tr>
+      </thead>
+      <tbody id="adm-tbody"></tbody>
+    </table>
+  </div>
+
+  <div class="pagination" id="pagination"></div>
+  <div class="status-bar" id="status-bar"></div>
+</div>
+
+<script>
+'use strict';
+
+// ── Supabase ──────────────────────────────────────────────────────────────────
+var SUPABASE_URL = 'https://wmmjvrdptvmqytbstxio.supabase.co';
+var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndtbWp2cmRwdHZtcXl0YnN0eGlvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA2ODAzMzQsImV4cCI6MjA5NjI1NjMzNH0.l_W6ZsHGxMGA5A_cpJEjusSoVoQsqVm4OTzBPowfAKE';
+var sb = null;
+
+// ── Auth constants ────────────────────────────────────────────────────────────
+var PW_SALT    = '5823ec38a53678373dad142f4afb9a60';
+var PW_HASH    = '11d0966a37b5629aa60801a16be798b3121cad9d8f2f479944b63c0d05ed0ee2';
+var MAX_TRIES  = 5;
+var LOCK_MS    = 15 * 60 * 1000;  // 15 min
+var SESSION_MS = 2  * 60 * 60 * 1000; // 2 hrs
+
+// ── State ─────────────────────────────────────────────────────────────────────
+var allData     = [];
+var filtered    = [];
+var currentPage = 1;
+var pageSize    = 50;
+var sortCol     = 'created_at';
+var sortAsc     = false;
+
+// ── PBKDF2 in browser via SubtleCrypto ────────────────────────────────────────
+async function hashPW(pw) {
+  var enc = new TextEncoder();
+  var keyMat = await crypto.subtle.importKey('raw', enc.encode(pw), 'PBKDF2', false, ['deriveBits']);
+  var bits = await crypto.subtle.deriveBits(
+    { name:'PBKDF2', salt:enc.encode(PW_SALT), iterations:310000, hash:'SHA-256' },
+    keyMat, 256
+  );
+  return Array.from(new Uint8Array(bits)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+// ── Rate limiting ─────────────────────────────────────────────────────────────
+function getAttempts() {
+  try {
+    var d = JSON.parse(sessionStorage.getItem('adm_att') || '{}');
+    return d;
+  } catch(e) { return {}; }
+}
+function saveAttempts(d) { sessionStorage.setItem('adm_att', JSON.stringify(d)); }
+
+function isLocked() {
+  var d = getAttempts();
+  if (d.locked && Date.now() < d.lockedUntil) return true;
+  if (d.locked && Date.now() >= d.lockedUntil) {
+    // Reset after lock period
+    saveAttempts({count:0});
+    return false;
+  }
+  return false;
+}
+
+function recordAttempt(success) {
+  var d = getAttempts();
+  if (success) { saveAttempts({count:0}); return; }
+  d.count = (d.count || 0) + 1;
+  if (d.count >= MAX_TRIES) {
+    d.locked = true;
+    d.lockedUntil = Date.now() + LOCK_MS;
+  }
+  saveAttempts(d);
+}
+
+// ── Session ───────────────────────────────────────────────────────────────────
+function setSession() {
+  sessionStorage.setItem('adm_sess', JSON.stringify({
+    expires: Date.now() + SESSION_MS,
+    token: crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36)
+  }));
+}
+function isSessionValid() {
+  try {
+    var s = JSON.parse(sessionStorage.getItem('adm_sess') || 'null');
+    return s && Date.now() < s.expires;
+  } catch(e) { return false; }
+}
+function logout() {
+  sessionStorage.removeItem('adm_sess');
+  location.reload();
+}
+
+// ── Login ─────────────────────────────────────────────────────────────────────
+async function tryLogin() {
+  var errEl  = document.getElementById('login-err');
+  var warnEl = document.getElementById('login-warn');
+  var btn    = document.getElementById('btn-login');
+  var bar    = document.getElementById('att-bar');
+  errEl.textContent = ''; warnEl.textContent = '';
+
+  if (isLocked()) {
+    var d = getAttempts();
+    var mins = Math.ceil((d.lockedUntil - Date.now()) / 60000);
+    errEl.textContent = '🔒 Acceso bloqueado. Intenta en ' + mins + ' min.';
+    bar.style.width = '100%';
+    return;
+  }
+
+  var pw = document.getElementById('pw-input').value;
+  if (!pw) { errEl.textContent = 'Ingresa la contraseña'; return; }
+
+  btn.disabled = true;
+  btn.textContent = 'Verificando...';
+
+  try {
+    var hash = await hashPW(pw);
+    var att  = getAttempts();
+
+    if (hash === PW_HASH) {
+      recordAttempt(true);
+      setSession();
+      showPanel();
+    } else {
+      recordAttempt(false);
+      var d = getAttempts();
+      var remaining = MAX_TRIES - (d.count || 0);
+      bar.style.width = ((d.count / MAX_TRIES) * 100) + '%';
+      if (d.locked) {
+        errEl.textContent = '🔒 Bloqueado 15 minutos por demasiados intentos fallidos.';
+      } else {
+        errEl.textContent = '❌ Contraseña incorrecta. Intentos restantes: ' + remaining;
+      }
+      document.getElementById('pw-input').value = '';
+    }
+  } catch(e) {
+    errEl.textContent = 'Error de verificación. Intenta de nuevo.';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🔐 Acceder';
+  }
+}
+
+// ── Show panel ────────────────────────────────────────────────────────────────
+function showPanel() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('admin-panel').style.display  = 'block';
+
+  // Init Supabase
+  sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  // Session timer
+  var s = JSON.parse(sessionStorage.getItem('adm_sess'));
+  var expires = new Date(s.expires);
+  document.getElementById('session-info').textContent =
+    'Sesión válida hasta ' + expires.toLocaleTimeString('es-MX');
+
+  // Auto-logout
+  setTimeout(logout, SESSION_MS);
+
+  loadData();
+}
+
+// ── Load data from Supabase ───────────────────────────────────────────────────
+async function loadData() {
+  document.getElementById('status-bar').textContent = 'Cargando datos...';
+  try {
+    // Usar RPC con token admin (RLS bloquea SELECT directo para anon)
+    var PW_HASH = '11d0966a37b5629aa60801a16be798b3121cad9d8f2f479944b63c0d05ed0ee2';
+    var res = await sb.rpc('get_encuestas_admin', { admin_token: PW_HASH });
+    if (res.error) throw res.error;
+    allData = (res.data || []).sort(function(a,b){ return new Date(b.created_at)-new Date(a.created_at); });
+    renderStats();
+    applyFilters();
+    document.getElementById('status-bar').textContent =
+      'Última actualización: ' + new Date().toLocaleString('es-MX') + ' · ' + allData.length + ' registros totales';
+  } catch(e) {
+    document.getElementById('status-bar').textContent = 'Error: ' + e.message;
+  }
+}
+
+// ── Stats ─────────────────────────────────────────────────────────────────────
+function renderStats() {
+  var total = allData.length;
+  var muj = allData.filter(r=>r.genero==='Mujer').length;
+  var hom = allData.filter(r=>r.genero==='Hombre').length;
+  var otr = total - muj - hom;
+  var cps = new Set(allData.map(r=>r.cp)).size;
+  var cols = new Set(allData.map(r=>r.colonia)).size;
+  var hoy = allData.filter(r=>{
+    var d = new Date(r.created_at);
+    var n = new Date();
+    return d.toDateString() === n.toDateString();
+  }).length;
+
+  var kpis = [
+    {n:total,  l:'Total respuestas'},
+    {n:hoy,    l:'Hoy'},
+    {n:muj,    l:'Mujeres'},
+    {n:hom,    l:'Hombres'},
+    {n:otr,    l:'Otro/NE'},
+    {n:cols,   l:'Colonias'},
+    {n:cps,    l:'CPs activos'},
+  ];
+  document.getElementById('adm-stats').innerHTML = kpis.map(k=>
+    '<div class="stat-card"><div class="num">'+k.n+'</div><div class="lbl">'+k.l+'</div></div>'
+  ).join('');
+}
+
+// ── Filters ───────────────────────────────────────────────────────────────────
+function applyFilters() {
+  var zona   = document.getElementById('f-zona').value;
+  var gen    = document.getElementById('f-gen').value;
+  var cp     = document.getElementById('f-cp').value.trim();
+  var search = document.getElementById('f-search').value.toLowerCase().trim();
+
+  filtered = allData.filter(function(r) {
+    if (zona && r.zona !== zona) return false;
+    if (cp   && r.cp !== cp)    return false;
+    if (gen === 'otro') {
+      if (r.genero === 'Mujer' || r.genero === 'Hombre') return false;
+    } else if (gen && r.genero !== gen) return false;
+    if (search) {
+      var hay = (r.nombre||'').toLowerCase() + (r.colonia||'').toLowerCase() +
+                (r.folio||'').toLowerCase()  + (r.cp||'');
+      if (!hay.includes(search)) return false;
+    }
+    return true;
+  });
+
+  // Sort
+  filtered.sort(function(a,b) {
+    var va = a[sortCol] || '';
+    var vb = b[sortCol] || '';
+    if (va < vb) return sortAsc ? -1 : 1;
+    if (va > vb) return sortAsc ? 1 : -1;
+    return 0;
+  });
+
+  document.getElementById('f-count').textContent = filtered.length + ' registros';
+  currentPage = 1;
+  renderTable();
+}
+
+function clearFilters() {
+  document.getElementById('f-zona').value   = '';
+  document.getElementById('f-gen').value    = '';
+  document.getElementById('f-cp').value     = '';
+  document.getElementById('f-search').value = '';
+  applyFilters();
+}
+
+function sortBy(col) {
+  if (sortCol === col) sortAsc = !sortAsc;
+  else { sortCol = col; sortAsc = true; }
+  applyFilters();
+}
+
+// ── Render table ──────────────────────────────────────────────────────────────
+function renderTable() {
+  var start = (currentPage - 1) * pageSize;
+  var page  = filtered.slice(start, start + pageSize);
+  var tbody = document.getElementById('adm-tbody');
+
+  if (!page.length) {
+    tbody.innerHTML = '<tr><td colspan="23" class="no-data">Sin registros</td></tr>';
+    document.getElementById('pagination').innerHTML = '';
+    return;
+  }
+
+  tbody.innerHTML = page.map(function(r) {
+    var fecha = r.created_at ? new Date(r.created_at).toLocaleString('es-MX') : '—';
+    var canales = Array.isArray(r.canales) ? r.canales.join(', ') : (r.canales||'—');
+    function sc(v) {
+      if (!v) return '<td style="color:#555">—</td>';
+      var n = parseFloat(v);
+      var col = n>=8?'#1DB954':n>=6?'#ffd23f':'#ff6b35';
+      return '<td style="color:'+col+';font-weight:700">'+n+'</td>';
+    }
+    return '<tr>' +
+      '<td class="folio">'+esc(r.folio)+'</td>' +
+      '<td>'+fecha+'</td>' +
+      '<td>'+esc(r.nombre)+'</td>' +
+      '<td>'+esc(r.edad)+'</td>' +
+      '<td><span class="badge badge-p">'+esc(r.genero||'N/E')+'</span></td>' +
+      '<td title="'+esc(r.colonia)+'">'+esc(r.colonia)+'</td>' +
+      '<td><span class="badge badge-v">'+esc(r.cp)+'</span></td>' +
+      '<td>'+esc(r.zona||'—')+'</td>' +
+      '<td>'+esc(r.whatsapp||'—')+'</td>' +
+      '<td>'+esc(r.email||'—')+'</td>' +
+      '<td>'+esc(r.nivel_edu||'—')+'</td>' +
+      '<td>'+esc(r.estado_laboral||'—')+'</td>' +
+      sc(r.esc_empleo)+sc(r.esc_seguridad)+sc(r.esc_salud)+sc(r.esc_educacion)+
+      sc(r.esc_urbanismo)+sc(r.esc_ambiente)+sc(r.esc_cultura)+sc(r.esc_participacion)+
+      sc(r.esc_oportunidades) +
+      '<td>'+esc(r.satisfaccion||'—')+'</td>' +
+      '<td title="'+esc(canales)+'">'+esc(canales).slice(0,30)+'</td>' +
+      '<td title="'+esc(r.comentario||'')+'">'+esc((r.comentario||'').slice(0,40))+'</td>' +
+      '<td title="'+esc(r.prop_empleo||'')+'">'+esc((r.prop_empleo||'').slice(0,30))+'</td>' +
+      '<td title="'+esc(r.prop_seguridad||'')+'">'+esc((r.prop_seguridad||'').slice(0,30))+'</td>' +
+      '<td title="'+esc(r.prop_salud||'')+'">'+esc((r.prop_salud||'').slice(0,30))+'</td>' +
+      '<td title="'+esc(r.prop_educacion||'')+'">'+esc((r.prop_educacion||'').slice(0,30))+'</td>' +
+      '<td title="'+esc(r.prop_oportunidades||'')+'">'+esc((r.prop_oportunidades||'').slice(0,30))+'</td>' +
+      '<td title="'+esc(r.prop_participacion||'')+'">'+esc((r.prop_participacion||'').slice(0,30))+'</td>' +
+      '<td title="'+esc(r.prop_urbanismo||'')+'">'+esc((r.prop_urbanismo||'').slice(0,30))+'</td>' +
+      '<td title="'+esc(r.prop_ambiente||'')+'">'+esc((r.prop_ambiente||'').slice(0,30))+'</td>' +
+      '<td title="'+esc(r.prop_cultura||'')+'">'+esc((r.prop_cultura||'').slice(0,30))+'</td>' +
+    '</tr>';
+  }).join('');
+
+  renderPagination();
+}
+
+function esc(s) {
+  if (s === null || s === undefined) return '—';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function renderPagination() {
+  var total = Math.ceil(filtered.length / pageSize);
+  if (total <= 1) { document.getElementById('pagination').innerHTML = ''; return; }
+  var btns = '';
+  var start = Math.max(1, currentPage - 2);
+  var end   = Math.min(total, currentPage + 2);
+  if (currentPage > 1) btns += '<button class="pg-btn" onclick="goPage('+(currentPage-1)+')">← Ant</button>';
+  for (var i = start; i <= end; i++) {
+    btns += '<button class="pg-btn'+(i===currentPage?' on':'')+'" onclick="goPage('+i+')">'+i+'</button>';
+  }
+  if (currentPage < total) btns += '<button class="pg-btn" onclick="goPage('+(currentPage+1)+')">Sig →</button>';
+  btns += '<span style="font-size:11px;color:var(--t3);margin-left:8px">Página '+currentPage+' de '+total+' ('+filtered.length+' registros)</span>';
+  document.getElementById('pagination').innerHTML = btns;
+}
+
+function goPage(p) { currentPage = p; renderTable(); window.scrollTo(0,0); }
+
+// ── Export CSV ────────────────────────────────────────────────────────────────
+function exportCSV() {
+  var cols = ['folio','created_at','nombre','edad','genero','colonia','cp','zona','whatsapp','email','prop_empleo','prop_seguridad','prop_salud','prop_educacion','prop_oportunidades','prop_participacion','prop_urbanismo','prop_ambiente','prop_cultura','comentario',
+              'nivel_edu','estado_laboral','esc_empleo','esc_seguridad','esc_oportunidades',
+              'esc_salud','esc_educacion','esc_participacion','esc_urbanismo','esc_ambiente',
+              'esc_cultura','satisfaccion','participaria','comentario',
+              'prop_empleo','prop_seguridad','prop_salud','prop_educacion',
+              'prop_urbanismo','prop_ambiente','prop_cultura','prop_oportunidades','prop_participacion'];
+  var rows = [cols.join(',')];
+  filtered.forEach(function(r) {
+    rows.push(cols.map(function(c) {
+      var v = r[c];
+      if (Array.isArray(v)) v = v.join('; ');
+      if (v === null || v === undefined) v = '';
+      v = String(v).replace(/"/g,'""');
+      return '"'+v+'"';
+    }).join(','));
+  });
+  download('voz-joven-morelia-'+today()+'.csv', rows.join('\n'), 'text/csv;charset=utf-8;');
+}
+
+// ── Export Excel (XLSX via HTML table trick) ──────────────────────────────────
+function exportExcel() {
+  var cols = ['Folio','Fecha','Nombre','Edad','Género','Colonia','CP','Zona','WhatsApp','Email','Prop.Empleo','Prop.Seguridad','Prop.Salud','Prop.Educación','Prop.Oportunidades','Prop.Participación','Prop.Urbanismo','Prop.Ambiente','Prop.Cultura','Comentario',
+              'Nivel educativo','Estado laboral','Empleo','Seguridad','Oportunidades',
+              'Salud','Educación','Participación','Urbanismo','Ambiente','Cultura',
+              'Satisfacción','Participaría','Comentario'];
+  var keys = ['folio','created_at','nombre','edad','genero','colonia','cp','zona','whatsapp','email','prop_empleo','prop_seguridad','prop_salud','prop_educacion','prop_oportunidades','prop_participacion','prop_urbanismo','prop_ambiente','prop_cultura','comentario',
+              'nivel_edu','estado_laboral','esc_empleo','esc_seguridad','esc_oportunidades',
+              'esc_salud','esc_educacion','esc_participacion','esc_urbanismo','esc_ambiente',
+              'esc_cultura','satisfaccion','participaria','comentario'];
+
+  var tbl = '<table><thead><tr>' + cols.map(c=>'<th>'+c+'</th>').join('') + '</tr></thead><tbody>';
+  filtered.forEach(function(r) {
+    tbl += '<tr>' + keys.map(function(k) {
+      var v = r[k];
+      if (Array.isArray(v)) v = v.join('; ');
+      return '<td>'+(v===null||v===undefined?'':String(v).replace(/</g,'&lt;'))+'</td>';
+    }).join('') + '</tr>';
+  });
+  tbl += '</tbody></table>';
+
+  var xls = '<?xml version="1.0" encoding="UTF-8"?>' +
+    '<?mso-application progid="Excel.Sheet"?>' +
+    '<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" '+
+    'xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">' +
+    '<Worksheet ss:Name="Voz Joven 2026"><Table>' +
+    cols.map(c=>'<Row><Cell><Data ss:Type="String">'+c+'</Data></Cell></Row>').join('') +
+    filtered.map(function(r) {
+      return '<Row>' + keys.map(function(k) {
+        var v = r[k];
+        if (Array.isArray(v)) v = v.join('; ');
+        if (v===null||v===undefined) v='';
+        var t = (typeof v==='number'||(!isNaN(v)&&v!==''))?'Number':'String';
+        return '<Cell><Data ss:Type="'+t+'">'+String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</Data></Cell>';
+      }).join('') + '</Row>';
+    }).join('') +
+    '</Table></Worksheet></Workbook>';
+
+  download('voz-joven-morelia-'+today()+'.xls', xls, 'application/vnd.ms-excel');
+}
+
+function download(name, content, mime) {
+  var bom = mime.includes('csv') ? '\uFEFF' : '';
+  var blob = new Blob([bom + content], {type: mime});
+  var url  = URL.createObjectURL(blob);
+  var a    = document.createElement('a');
+  a.href = url; a.download = name; a.click();
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+}
+
+function today() {
+  return new Date().toISOString().slice(0,10);
+}
+
+// ── Auto-check session on load ────────────────────────────────────────────────
+window.addEventListener('load', function() {
+  if (isSessionValid()) showPanel();
+  else {
+    // Check if locked
+    if (isLocked()) {
+      var d = getAttempts();
+      var mins = Math.ceil((d.lockedUntil - Date.now()) / 60000);
+      document.getElementById('login-err').textContent = '🔒 Acceso bloqueado. Intenta en ' + mins + ' min.';
+      document.getElementById('att-bar').style.width = '100%';
+    }
+  }
+  // Prevent tab title from showing sensitive info
+  document.addEventListener('visibilitychange', function() {
+    if (document.hidden) document.title = '...';
+    else document.title = 'Admin — Voz Joven Morelia 2026';
+  });
+});
+
+// Prevent right-click context menu in admin panel
+document.addEventListener('contextmenu', function(e) {
+  if (document.getElementById('admin-panel').style.display !== 'none') e.preventDefault();
+});
+</script>
+</body>
+</html>
